@@ -5,20 +5,32 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Gizlilik Politikası – Hi‑Ka Araç Yönetimi</title>
   <style>
-    :root{--bg:#ffffff;--fg:#0b1220;--muted:#5d6470;--line:#e8ebef}
+    :root{--muted:#5d6470;--panel:rgba(255,255,255,.80);--panelBorder:rgba(12,18,32,.08);--overlay:rgba(0,0,0,.42);--line:#e8ebef;--fg:#0b1220}
     @media (prefers-color-scheme: dark){
-      :root{--bg:#0b0f17;--fg:#e8eef7;--muted:#98a2b3;--line:#1d2430}
+      :root{--muted:#98a2b3;--panel:rgba(16,22,34,.74);--panelBorder:rgba(255,255,255,.08);--overlay:rgba(0,0,0,.55);--line:#1d2430;--fg:#e8eef7}
     }
-    body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.6}
-    .wrap{max-width:880px;margin:0 auto;padding:40px 20px}
+    *{box-sizing:border-box}
+    body{margin:0;color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.6}
+    .bg{position:fixed;inset:0;z-index:-2;background:url("./assets/background.png") center/cover no-repeat fixed;filter:grayscale(.1) brightness(.8)}
+    .bg::after{content:"";position:absolute;inset:0;background:var(--overlay)}
+    .wrap{max-width:880px;margin:0 auto;padding:72px 20px 40px}
+    .back{position:fixed;left:16px;top:16px;z-index:10}
+    .back a{display:inline-block;padding:8px 10px;border-radius:8px;background:var(--panel);border:1px solid var(--panelBorder);color:inherit;text-decoration:none}
     h1{margin:0 0 12px} h2{margin:24px 0 8px;font-size:20px}
     p{margin:8px 0} ul{margin:8px 0 16px 20px}
-    .muted{color:var(--muted)}
-    .box{border:1px solid var(--line);border-radius:12px;padding:16px}
+    .box{border:1px solid var(--panelBorder);border-radius:12px;padding:16px;background:var(--panel);backdrop-filter:saturate(140%) blur(6px)}
     a{color:inherit}
+    .muted{color:var(--muted)}
   </style>
+  <script>
+    function goBack(){ if (history.length > 1) history.back(); else location.href="./index.html"; }
+  </script>
 </head>
 <body>
+  <div class="bg"></div>
+
+  <div class="back"><a href="javascript:void(0)" onclick="goBack()">← Geri</a></div>
+
   <div class="wrap">
     <h1>Gizlilik Politikası</h1>
     <p class="muted">Yürürlük tarihi: 06.09.2025</p>
@@ -40,7 +52,7 @@
     </ul>
 
     <h2>Paylaşım ve Güvenlik</h2>
-    <p>Veriler HTTPS/TLS ile iletilir. Reklam/izleme amacıyla üçüncü taraflarla paylaşılmaz. Google hizmetleri (Drive, Sheets, Firebase) sadece uygulama işlevi için kullanılır.</p>
+    <p>Veriler HTTPS/TLS ile iletilir. Reklam/izleme amacıyla üçüncü taraflarla paylaşılmaz. Google hizmetleri (Drive, Sheets, Firebase) yalnızca uygulama işlevi için kullanılır.</p>
 
     <h2>Veri Saklama ve Haklar</h2>
     <p>Veriler kurumsal gereksinimler ve mevzuata uygun sürelerde saklanır. Erişim/düzeltme/silme talepleri için <a href="mailto:info@hika.com.tr">info@hika.com.tr</a> adresine yazabilirsiniz.</p>
