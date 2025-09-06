@@ -13,19 +13,33 @@
       --panelFg: #f1f4f8; --panelMuted:#c7cfde;
       --chipBg: rgba(255,255,255,.10); --chipBorder: rgba(255,255,255,.30);
     }
-    *{box-sizing:border-box} body{margin:0; color:#fff; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; line-height:1.6}
-    .bg{position:fixed; inset:0; z-index:-2; background:url("./assets/background.png") center/cover no-repeat fixed; filter:grayscale(.25) brightness(.38)}
+    *{box-sizing:border-box}
+    body{
+      margin:0; color:#fff; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      line-height:1.6;
+    }
+    .bg{
+      position:fixed; inset:0; z-index:-2;
+      background:url("./assets/background.png") center/cover no-repeat fixed;
+      filter:grayscale(.25) brightness(.38);
+    }
     .bg::after{content:""; position:absolute; inset:0; background:var(--overlay);}
     .wrap{max-width:900px; margin:0 auto; padding:80px 20px 40px}
     .back{position:fixed; left:16px; top:16px; z-index:10}
-    .back a{display:inline-block; padding:8px 12px; border-radius:10px; background:var(--chipBg); border:1px solid var(--chipBorder); color:#fff; text-decoration:none; backdrop-filter:blur(8px)}
+    .back a{
+      display:inline-block; padding:8px 12px; border-radius:10px;
+      background:var(--chipBg); border:1px solid var(--chipBorder);
+      color:#fff; text-decoration:none; backdrop-filter:blur(8px);
+    }
     h1{margin:0 0 10px; text-shadow:0 3px 14px rgba(0,0,0,.55)}
-    h2{margin:22px 0 8px; font-size:20px}
+    h2{margin:26px 0 10px; font-size:20px}
     p{margin:8px 0}
     .box{
       background:linear-gradient(180deg,var(--panelBg1),var(--panelBg2));
-      border:1px solid var(--panelBorder); border-radius:16px; padding:18px; color:var(--panelFg);
-      box-shadow:0 20px 40px rgba(0,0,0,.35); backdrop-filter:blur(10px) saturate(140%);
+      border:1px solid var(--panelBorder); border-radius:16px; padding:18px;
+      color:var(--panelFg); box-shadow:0 20px 40px rgba(0,0,0,.35);
+      backdrop-filter:blur(10px) saturate(140%);
+      margin:14px 0 22px; /* kartlar arası boşluk */
     }
     .muted{color:var(--panelMuted)}
     a{color:#e8ecf8}
