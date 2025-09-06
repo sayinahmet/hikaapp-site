@@ -5,22 +5,35 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Destek – Hi‑Ka Araç Yönetimi</title>
   <style>
-    :root{--bg:#ffffff;--fg:#0b1220;--muted:#5d6470;--line:#e8ebef;--brand:#0a6cff}
+    :root{--muted:#5d6470;--panel:rgba(255,255,255,.80);--panelBorder:rgba(12,18,32,.08);--overlay:rgba(0,0,0,.42);--line:#e8ebef;--fg:#0b1220}
     @media (prefers-color-scheme: dark){
-      :root{--bg:#0b0f17;--fg:#e8eef7;--muted:#98a2b3;--line:#1d2430;--brand:#64a8ff}
+      :root{--muted:#98a2b3;--panel:rgba(16,22,34,.74);--panelBorder:rgba(255,255,255,.08);--overlay:rgba(0,0,0,.55);--line:#1d2430;--fg:#e8eef7}
     }
-    body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.6}
-    .wrap{max-width:880px;margin:0 auto;padding:40px 20px}
+    *{box-sizing:border-box}
+    body{margin:0;color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.6}
+    .bg{position:fixed;inset:0;z-index:-2;background:url("./assets/background.png") center/cover no-repeat fixed;filter:grayscale(.1) brightness(.8)}
+    .bg::after{content:"";position:absolute;inset:0;background:var(--overlay)}
+    .wrap{max-width:880px;margin:0 auto;padding:72px 20px 40px}
+    .back{position:fixed;left:16px;top:16px;z-index:10}
+    .back a{display:inline-block;padding:8px 10px;border-radius:8px;background:var(--panel);border:1px solid var(--panelBorder);color:inherit;text-decoration:none}
     h1{margin:0 0 12px} h2{margin:24px 0 8px;font-size:20px}
     p{margin:8px 0} ul{margin:8px 0 16px 20px}
-    .box{border:1px solid var(--line);border-radius:12px;padding:16px}
-    a{color:var(--brand);text-decoration:none}
+    .box{border:1px solid var(--panelBorder);border-radius:12px;padding:16px;background:var(--panel);backdrop-filter:saturate(140%) blur(6px)}
+    a{color:inherit;text-decoration:underline}
+    .muted{color:var(--muted)}
   </style>
+  <script>
+    function goBack(){ if (history.length > 1) history.back(); else location.href="./index.html"; }
+  </script>
 </head>
 <body>
+  <div class="bg"></div>
+
+  <div class="back"><a href="javascript:void(0)" onclick="goBack()">← Geri</a></div>
+
   <div class="wrap">
     <h1>Destek</h1>
-    <p>Hi‑Ka Araç Yönetimi kurumsal kullanım için geliştirilmiştir. Aşağıdaki kanallardan bize ulaşabilirsiniz.</p>
+    <p class="muted">Hi‑Ka Araç Yönetimi kurumsal kullanım için geliştirilmiştir. Aşağıdaki kanallardan bize ulaşabilirsiniz.</p>
 
     <div class="box">
       <h2>İletişim</h2>
