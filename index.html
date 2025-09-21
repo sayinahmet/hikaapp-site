@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Hi‑Ka Araç Yönetimi</title>
-  <meta name="description" content="Plaka sorgulama, yakıt takibi, belge yönetimi ve raporlar."/>
+  <title>HİKA App - Kurumsal Araç Yönetim Sistemi</title>
+  <meta name="description" content="HİKA İnşaat için geliştirilmiş mobil araç yönetim uygulaması. Plaka sorgulama, yakıt takibi, belge yönetimi, AI asistan ve rol bazlı erişim kontrolü."/>
+  <link rel="icon" href="./assets/logo-120.png" type="image/png">
   <style>
     :root{
       --overlay: rgba(0,0,0,.78);
@@ -30,7 +31,11 @@
     .wrap{max-width:1100px; margin:0 auto; padding:0 20px}
     header{position:sticky; top:0; z-index:5; backdrop-filter:blur(10px) saturate(140%);}
     .nav{display:flex; align-items:center; justify-content:space-between; height:64px}
-    .brand{font-weight:700; letter-spacing:.2px; color:#fff; text-shadow:0 1px 8px rgba(0,0,0,.5)}
+    .brand{
+      display:flex; align-items:center; font-weight:700; letter-spacing:.2px; 
+      color:#fff; text-shadow:0 1px 8px rgba(0,0,0,.5);
+    }
+    .brand img{width:32px; height:32px; margin-right:12px; border-radius:6px}
     .chips a{
       display:inline-block; margin-left:10px; color:#fff; text-decoration:none;
       background:var(--chipBg); border:1px solid var(--chipBorder); padding:8px 12px; border-radius:10px;
@@ -39,7 +44,7 @@
     .hero{padding:56px 0 8px}
     .hero h1{margin:0 0 8px; font-size:36px; line-height:1.25; text-shadow:0 3px 14px rgba(0,0,0,.55)}
     .hero p{margin:0; color:rgba(255,255,255,.92); text-shadow:0 2px 10px rgba(0,0,0,.5)}
-    .grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; margin:28px 0 8px}
+    .grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; margin:28px 0 8px}
     .card{
       background:linear-gradient(180deg,var(--panelBg1),var(--panelBg2));
       border:1px solid var(--panelBorder); border-radius:16px; padding:20px;
@@ -51,6 +56,7 @@
     footer{border-top:1px solid rgba(255,255,255,.08); margin-top:28px}
     .foot{display:flex; justify-content:space-between; align-items:center; height:64px; color:#d9e0ee}
     .foot a{color:#d9e0ee}
+    .card h3{margin:0 0 12px; font-size:18px; color:var(--panelFg)}
     @media (max-width:980px){ .grid{grid-template-columns:1fr} .hero h1{font-size:30px} }
   </style>
 </head>
@@ -59,7 +65,10 @@
 
   <header>
     <div class="wrap nav">
-      <div class="brand">Hi‑Ka Araç Yönetimi</div>
+      <div class="brand">
+        <img src="./assets/logo-120.png" alt="HİKA App Logo">
+        HİKA App
+      </div>
       <div class="chips">
         <a href="./support.html">Destek</a>
         <a href="./privacy.html">Gizlilik</a>
@@ -69,23 +78,58 @@
 
   <main class="wrap">
     <section class="hero">
-      <h1>Kurumsal araç yönetimini sadeleştirin</h1>
-      <p>Plaka sorgulama, yakıt ve maliyet takibi, belge yönetimi ve yapay zekâ destekli asistan.</p>
+      <h1>HİKA İnşaat Kurumsal Araç Yönetim Sistemi</h1>
+      <p>HİKA İnşaat şirketi için özel olarak geliştirilmiş mobil araç yönetim uygulaması. Rol bazlı erişim kontrolü, Google servisleri entegrasyonu ve AI destekli asistan ile araç operasyonlarınızı optimize edin.</p>
     </section>
 
     <section class="grid">
       <article class="card">
-        <h2>Plaka & Veri</h2>
-        <p>Akıllı plaka eşleştirme ve Google Sheets ile senkron veri.</p>
+        <h2>🔍 Akıllı Plaka Sorgulama</h2>
+        <p>Google Sheets entegrasyonu ile gerçek zamanlı veri sorgulama. Çoklu plaka formatı desteği, sesli giriş ve otomatik eşleştirme algoritması.</p>
       </article>
       <article class="card">
-        <h2>Yakıt & Rapor</h2>
-        <p>Tüketim ve maliyet görünürlüğü, dışa aktarma ve temel metrikler.</p>
+        <h2>📊 Maliyet Raporları & Analiz</h2>
+        <p>Yakıt tüketimi, bakım maliyetleri ve operasyonel giderlerin detaylı analizi. Excel export, grafik görünümü ve trend analizi.</p>
       </article>
       <article class="card">
-        <h2>Belgeler</h2>
-        <p>Google Drive entegrasyonu ile evraklara güvenli erişim.</p>
+        <h2>📁 Belge Yönetimi</h2>
+        <p>Google Drive entegrasyonu ile araç belgelerine güvenli erişim. PDF görüntüleme, indirme ve organize dosya yapısı.</p>
       </article>
+      <article class="card">
+        <h2>🤖 AI Destekli Asistan</h2>
+        <p>Google Generative AI ile doğal dil işleme. Akıllı sorgular, bağlamsal yanıtlar ve sesli komut desteği.</p>
+      </article>
+      <article class="card">
+        <h2>👥 Rol Bazlı Erişim</h2>
+        <p>Admin, Personel ve Misafir rolleri ile güvenli yetkilendirme. Firebase Authentication ve otomatik oturum yönetimi.</p>
+      </article>
+      <article class="card">
+        <h2>🔒 Güvenlik & Gizlilik</h2>
+        <p>OAuth 2.0 kimlik doğrulama, HTTPS şifreli veri iletimi ve şirket içi kullanım için optimize edilmiş güvenlik önlemleri.</p>
+      </article>
+    </section>
+
+    <section class="hero">
+      <h2>Veri Kullanımı ve Şeffaflık</h2>
+      <div class="card">
+        <h3>Google Services Entegrasyonu</h3>
+        <p><strong>Google Sheets API:</strong> Araç verilerinin gerçek zamanlı senkronizasyonu için kullanılır. Plaka bilgileri, yakıt kayıtları ve maliyet verileri Google Sheets'ten güvenli bir şekilde çekilir.</p>
+        <p><strong>Google Drive API:</strong> Araç belgelerinin (ruhsat, sigorta, bakım kayıtları) güvenli depolanması ve erişimi için kullanılır. Dosyalar şifrelenerek iletilir.</p>
+        <p><strong>Firebase Authentication:</strong> Kullanıcı kimlik doğrulama ve oturum yönetimi. Sadece yetkili HİKA İnşaat personeli erişebilir.</p>
+        <p><strong>Google Generative AI:</strong> AI asistan özelliği için doğal dil işleme. Kullanıcı sorguları işlenir, kişisel veriler saklanmaz.</p>
+      </div>
+    </section>
+
+    <section class="hero">
+      <h2>HİKA İnşaat Hakkında</h2>
+      <div class="card">
+        <p>Bu uygulama <strong>HİKA İnşaat</strong> şirketi için özel olarak geliştirilmiş kurumsal bir araç yönetim sistemidir. Şirket içi kullanım için tasarlanmış olup, herhangi bir ticari amaç taşımamaktadır.</p>
+        <p><strong>Şirket Bilgileri:</strong><br>
+        HİKA İnşaat ve Taahhüt Ltd. Şti.<br>
+        Palmiye Mah. Adnan Menderes Blv. Nihal Apt. No: 22 İç Kapı No: 1<br>
+        Yenişehir/Mersin, Türkiye<br>
+        E-posta: info@hika.com.tr</p>
+      </div>
     </section>
   </main>
 
