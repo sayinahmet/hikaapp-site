@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kullanım Koşulları – Hi‑Ka Araç Yönetimi</title>
+  <style>
+    :root{
+      --overlay: rgba(0,0,0,.78);
+      --panelBg1: rgba(20,24,32,.94);
+      --panelBg2: rgba(20,24,32,.88);
+      --panelBorder: rgba(255,255,255,.10);
+      --panelFg: #f1f4f8; --panelMuted:#c7cfde;
+      --chipBg: rgba(255,255,255,.10); --chipBorder: rgba(255,255,255,.30);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; color:#fff; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      line-height:1.6;
+    }
+    .bg{
+      position:fixed; inset:0; z-index:-2;
+      background:url("./assets/background.png") center/cover no-repeat fixed;
+      filter:grayscale(.25) brightness(.38);
+    }
+    .bg::after{content:""; position:absolute; inset:0; background:var(--overlay);}
+    .wrap{max-width:900px; margin:0 auto; padding:80px 20px 40px}
+    .back{position:fixed; left:16px; top:16px; z-index:10}
+    .back a{
+      display:inline-block; padding:8px 12px; border-radius:10px;
+      background:var(--chipBg); border:1px solid var(--chipBorder);
+      color:#fff; text-decoration:none; backdrop-filter:blur(8px);
+    }
+    h1{margin:0 0 10px; text-shadow:0 3px 14px rgba(0,0,0,.55)}
+    h2{margin:26px 0 10px; font-size:20px}
+    p{margin:8px 0}
+    .box{
+      background:linear-gradient(180deg,var(--panelBg1),var(--panelBg2));
+      border:1px solid var(--panelBorder); border-radius:16px; padding:18px;
+      color:var(--panelFg); box-shadow:0 20px 40px rgba(0,0,0,.35);
+      backdrop-filter:blur(10px) saturate(140%);
+      margin:14px 0 22px; /* kartlar arası boşluk */
+    }
+    .muted{color:var(--panelMuted)}
+    a{color:#e8ecf8}
+  </style>
+  <script>function goBack(){ if(history.length>1) history.back(); else location.href="./index.html"; }</script>
+</head>
+<body>
+  <div class="bg"></div>
+
+  <div class="back"><a href="javascript:void(0)" onclick="goBack()">← Geri</a></div>
+
+  <main class="wrap">
+    <h1>Kullanım Koşulları</h1>
+    <p class="muted">Yürürlük tarihi: 21.09.2025</p>
+
+    <section class="box">
+      <h2>Uygulama Kapsamı</h2>
+      <p>HİKA App, HİKA İnşaat ve Taahhüt Ltd. Şti. tarafından şirket çalışanları için geliştirilmiş kurumsal bir araç yönetim sistemidir.</p>
+      <p>Bu uygulama yalnızca şirket içi kullanım için tasarlanmış olup, ticari amaçlı değildir.</p>
+    </section>
+
+    <section class="box">
+      <h2>Kullanım Hakları</h2>
+      <p>• Uygulama sadece yetkili HİKA İnşaat personeli tarafından kullanılabilir</p>
+      <p>• Kullanıcılar Google hesapları ile kimlik doğrulama yaparlar</p>
+      <p>• Erişim izinleri rol bazlı olarak (Admin, Personel, Misafir) yönetilir</p>
+      <p>• Şirket dışı kullanım yasaktır</p>
+    </section>
+
+    <section class="box">
+      <h2>Kullanıcı Sorumlulukları</h2>
+      <p>• Hesap bilgilerini güvende tutmak</p>
+      <p>• Uygulamayı amacına uygun kullanmak</p>
+      <p>• Şirket verilerini korumak ve paylaşmamak</p>
+      <p>• Sistemi kötüye kullanmamak</p>
+    </section>
+
+    <section class="box">
+      <h2>Veri Güvenliği</h2>
+      <p>• Tüm veriler HTTPS ile şifrelenerek iletilir</p>
+      <p>• Google servisleri (Sheets, Drive, Firebase) güvenli entegrasyon için kullanılır</p>
+      <p>• Kullanıcı verileri şirket içi kalır, üçüncü taraflarla paylaşılmaz</p>
+    </section>
+
+    <section class="box">
+      <h2>Hizmet Sınırlamaları</h2>
+      <p>• Uygulama "olduğu gibi" sunulur</p>
+      <p>• HİKA İnşaat kesinti veya veri kaybından sorumlu değildir</p>
+      <p>• Servis kullanılabilirliği garanti edilmez</p>
+    </section>
+
+    <section class="box">
+      <h2>Değişiklikler</h2>
+      <p>HİKA İnşaat bu koşulları önceden haber vermeksizin değiştirme hakkını saklı tutar. Değişiklikler yürürlük tarihinden itibaren geçerlidir.</p>
+    </section>
+
+    <section class="box">
+      <h2>İletişim</h2>
+      <p>Kullanım koşulları hakkında sorularınız için: <a href="mailto:info@hika.com.tr">info@hika.com.tr</a></p>
+      <p>HİKA İnşaat ve Taahhüt Ltd. Şti.<br>
+      Palmiye Mah. Adnan Menderes Blv. Nihal Apt. No: 22 İç Kapı No: 1<br>
+      Yenişehir/Mersin, Türkiye</p>
+    </section>
+
+    <p><a href="./index.html">Ana sayfaya dön</a></p>
+  </main>
+</body>
+</html>
