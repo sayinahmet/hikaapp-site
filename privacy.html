@@ -42,6 +42,13 @@
       margin:14px 0 22px; /* kartlar arası boşluk */
     }
     .muted{color:var(--panelMuted)}
+    .step{
+      background: rgba(255,255,255,.05);
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin: 8px 0;
+      border-left: 3px solid rgba(255,255,255,.3);
+    }
     a{color:#e8ecf8}
   </style>
   <script>function goBack(){ if(history.length>1) history.back(); else location.href="./index.html"; }</script>
@@ -66,30 +73,40 @@
       <h2>Google API Kullanımı ve Veri Erişimi</h2>
       <p>Uygulamamız aşağıdaki Google API izinlerini kullanmaktadır:</p>
       
-      <p><strong>1. Google Sheets API (spreadsheets.readonly):</strong><br>
-      • <strong>Erişilen Veri:</strong> Şirket araç bilgileri, yakıt kayıtları ve maliyet raporlarını içeren Google Sheets dokümanları (sadece belirlenmiş spreadsheet ID'ler)<br>
-      • <strong>Kullanım Amacı:</strong> Kullanıcıların plaka sorgulaması yaparak araç bilgilerini görüntülemesi<br>
-      • <strong>Veri İşleme:</strong> Sheets verileri okunur, Google BigQuery veri ambarına senkronize edilir ve yetkili kullanıcılara sunulur. Hiçbir değişiklik yapılmaz (sadece okuma).</p>
+      <div class="step">
+        <strong>1. Google Sheets API (spreadsheets.readonly):</strong><br>
+        • <strong>Erişilen Veri:</strong> Şirket araç bilgileri, yakıt kayıtları ve maliyet raporlarını içeren Google Sheets dokümanları (sadece belirlenmiş spreadsheet ID'ler)<br>
+        • <strong>Kullanım Amacı:</strong> Kullanıcıların plaka sorgulaması yaparak araç bilgilerini görüntülemesi<br>
+        • <strong>Veri İşleme:</strong> Sheets verileri okunur, Google BigQuery veri ambarına senkronize edilir ve yetkili kullanıcılara sunulur. Hiçbir değişiklik yapılmaz (sadece okuma).
+      </div>
 
-      <p><strong>2. Google Drive API (drive.readonly):</strong><br>
-      • <strong>Erişilen Veri:</strong> Araçlara ait belgeler (sigorta poliçeleri, ruhsat fotokopyaları, bakım kayıtları) - sadece belirlenmiş klasörler<br>
-      • <strong>Kullanım Amacı:</strong> Yetkili kullanıcıların araç belgelerini mobil uygulama üzerinden görüntülemesi<br>
-      • <strong>Veri İşleme:</strong> Belgeler yalnızca görüntüleme amacıyla geçici olarak önbelleğe alınır. Hiçbir değişiklik yapılmaz (sadece okuma).</p>
+      <div class="step">
+        <strong>2. Google Drive API (drive.readonly):</strong><br>
+        • <strong>Erişilen Veri:</strong> Araçlara ait belgeler (sigorta poliçeleri, ruhsat fotokopyaları, bakım kayıtları) - sadece belirlenmiş klasörler<br>
+        • <strong>Kullanım Amacı:</strong> Yetkili kullanıcıların araç belgelerini mobil uygulama üzerinden görüntülemesi<br>
+        • <strong>Veri İşleme:</strong> Belgeler yalnızca görüntüleme amacıyla geçici olarak önbelleğe alınır. Hiçbir değişiklik yapılmaz (sadece okuma).
+      </div>
 
-      <p><strong>3. Kimlik Doğrulama (profile, email):</strong><br>
-      • <strong>Erişilen Veri:</strong> Google hesabı e-posta adresi ve temel profil bilgisi<br>
-      • <strong>Kullanım Amacı:</strong> Kullanıcı kimlik doğrulama ve rol atama<br>
-      • <strong>Veri İşleme:</strong> Firebase Authentication ve uygulama veritabanında saklanır.</p>
+      <div class="step">
+        <strong>3. Kimlik Doğrulama (profile, email):</strong><br>
+        • <strong>Erişilen Veri:</strong> Google hesabı e-posta adresi ve temel profil bilgisi<br>
+        • <strong>Kullanım Amacı:</strong> Kullanıcı kimlik doğrulama ve rol atama<br>
+        • <strong>Veri İşleme:</strong> Firebase Authentication ve uygulama veritabanında saklanır.
+      </div>
 
-      <p><strong>Önemli Güvenlik Önlemleri:</strong><br>
-      • Yalnızca önceden tanımlanmış, sabit (hard-coded) spreadsheet ve klasör ID'lerine erişim vardır<br>
-      • Kullanıcılar rastgele Google dokümanlarına veya klasörlerine erişemez<br>
-      • Rol tabanlı erişim kontrolü: Sadece yetkili kullanıcılar (Personel ve Admin) bu verilere erişebilir<br>
-      • Misafir kullanıcılar Google API verilerine hiçbir şekilde erişemez<br>
-      • Tüm API çağrıları backend sunucusu üzerinden doğrulanır ve loglanır</p>
+      <div class="step">
+        <strong>Önemli Güvenlik Önlemleri:</strong><br>
+        • Yalnızca önceden tanımlanmış, sabit (hard-coded) spreadsheet ve klasör ID'lerine erişim vardır<br>
+        • Kullanıcılar rastgele Google dokümanlarına veya klasörlerine erişemez<br>
+        • Rol tabanlı erişim kontrolü: Sadece yetkili kullanıcılar (Personel ve Admin) bu verilere erişebilir<br>
+        • Misafir kullanıcılar Google API verilerine hiçbir şekilde erişemez<br>
+        • Tüm API çağrıları backend sunucusu üzerinden doğrulanır ve loglanır
+      </div>
 
-      <p><strong>Google API Services User Data Policy Uyumu:</strong><br>
-      Uygulamamız Google API Services User Data Policy gerekliliklerine tam uyum göstermektedir. Google kullanıcı verileri yalnızca yukarıda belirtilen iş amaçları için kullanılır ve hiçbir şekilde üçüncü taraflarla paylaşılmaz, satılmaz veya reklam amaçlı işlenmez.</p>
+      <div class="step">
+        <strong>Google API Services User Data Policy Uyumu:</strong><br>
+        Uygulamamız Google API Services User Data Policy gerekliliklerine tam uyum göstermektedir. Google kullanıcı verileri yalnızca yukarıda belirtilen iş amaçları için kullanılır ve hiçbir şekilde üçüncü taraflarla paylaşılmaz, satılmaz veya reklam amaçlı işlenmez.
+      </div>
     </section>
 
     <section class="box">
@@ -101,40 +118,58 @@
 
     <section class="box">
       <h2>Veri Depolama ve Güvenlik</h2>
-      <p><strong>Depolama Altyapısı:</strong><br>
-      • <strong>Firebase Authentication:</strong> Kullanıcı kimlik bilgileri (email, profil)<br>
-      • <strong>Google BigQuery:</strong> Araç verileri, yakıt kayıtları, maliyet raporları (Google Sheets'ten senkronize)<br>
-      • <strong>Uygulama Veritabanı:</strong> Kullanıcı rolleri ve yetkilendirme bilgileri</p>
+      
+      <div class="step">
+        <strong>Depolama Altyapısı:</strong><br>
+        • <strong>Firebase Authentication:</strong> Kullanıcı kimlik bilgileri (email, profil)<br>
+        • <strong>Google BigQuery:</strong> Araç verileri, yakıt kayıtları, maliyet raporları (Google Sheets'ten senkronize)<br>
+        • <strong>Uygulama Veritabanı:</strong> Kullanıcı rolleri ve yetkilendirme bilgileri
+      </div>
 
-      <p><strong>Güvenlik Önlemleri:</strong><br>
-      • Tüm veriler HTTPS/TLS şifrelemesi ile iletilir<br>
-      • Google Cloud Platform güvenlik standartlarına tam uyum<br>
-      • Rol tabanlı erişim kontrolü (RBAC) uygulanır<br>
-      • Backend API üzerinden tüm istekler doğrulanır ve yetkilendirilir<br>
-      • Düzenli güvenlik güncellemeleri ve izleme</p>
+      <div class="step">
+        <strong>Güvenlik Önlemleri:</strong><br>
+        • Tüm veriler HTTPS/TLS şifrelemesi ile iletilir<br>
+        • Google Cloud Platform güvenlik standartlarına tam uyum<br>
+        • Rol tabanlı erişim kontrolü (RBAC) uygulanır<br>
+        • Backend API üzerinden tüm istekler doğrulanır ve yetkilendirilir<br>
+        • Düzenli güvenlik güncellemeleri ve izleme
+      </div>
 
-      <p><strong>Üçüncü Taraf Paylaşımı:</strong><br>
-      Kullanıcı verileri hiçbir şekilde reklam, pazarlama veya izleme amacıyla üçüncü taraflarla paylaşılmaz, satılmaz veya aktarılmaz. Google hizmetleri (Drive, Sheets, Firebase, BigQuery) yalnızca uygulamanın temel işlevselliği için kullanılır.</p>
+      <div class="step">
+        <strong>Üçüncü Taraf Paylaşımı:</strong><br>
+        Kullanıcı verileri hiçbir şekilde reklam, pazarlama veya izleme amacıyla üçüncü taraflarla paylaşılmaz, satılmaz veya aktarılmaz. Google hizmetleri (Drive, Sheets, Firebase, BigQuery) yalnızca uygulamanın temel işlevselliği için kullanılır.
+      </div>
     </section>
 
     <section class="box">
       <h2>Veri Saklama Süresi ve Silme</h2>
-      <p><strong>Saklama Süreleri:</strong><br>
-      • <strong>Kullanıcı Profil Bilgileri:</strong> Hesap aktif olduğu sürece saklanır<br>
-      • <strong>Google Sheets/Drive Verileri:</strong> Geçici olarak önbelleğe alınır, düzenli aralıklarla güncellenir<br>
-      • <strong>BigQuery Verileri:</strong> İş gereksinimlerine göre saklanır (maksimum 5 yıl)<br>
-      • <strong>Hata ve Kullanım Logları:</strong> Maksimum 90 gün</p>
+      
+      <div class="step">
+        <strong>Saklama Süreleri:</strong><br>
+        • <strong>Kullanıcı Profil Bilgileri:</strong> Hesap aktif olduğu sürece saklanır<br>
+        • <strong>Google Sheets/Drive Verileri:</strong> Geçici olarak önbelleğe alınır, düzenli aralıklarla güncellenir<br>
+        • <strong>BigQuery Verileri:</strong> İş gereksinimlerine göre saklanır (maksimum 5 yıl)<br>
+        • <strong>Hata ve Kullanım Logları:</strong> Maksimum 90 gün
+      </div>
 
-      <p><strong>Veri Silme Süreci:</strong><br>
-      Kullanıcılar aşağıdaki haklara sahiptir:<br>
-      • <strong>Erişim Hakkı:</strong> Saklanan kişisel verilerinizi talep edebilirsiniz<br>
-      • <strong>Düzeltme Hakkı:</strong> Yanlış veya eksik bilgilerin düzeltilmesini isteyebilirsiniz<br>
-      • <strong>Silme Hakkı:</strong> Hesabınızın ve ilişkili tüm verilerin silinmesini talep edebilirsiniz<br>
-      • <strong>İtiraz Hakkı:</strong> Veri işleme faaliyetlerine itiraz edebilirsiniz</p>
+      <div class="step">
+        <strong>Veri Silme Süreci:</strong><br>
+        Kullanıcılar aşağıdaki haklara sahiptir:<br>
+        • <strong>Erişim Hakkı:</strong> Saklanan kişisel verilerinizi talep edebilirsiniz<br>
+        • <strong>Düzeltme Hakkı:</strong> Yanlış veya eksik bilgilerin düzeltilmesini isteyebilirsiniz<br>
+        • <strong>Silme Hakkı:</strong> Hesabınızın ve ilişkili tüm verilerin silinmesini talep edebilirsiniz<br>
+        • <strong>İtiraz Hakkı:</strong> Veri işleme faaliyetlerine itiraz edebilirsiniz
+      </div>
 
-      <p>Bu haklarınızı kullanmak için <a href="mailto:info@hika.com.tr">info@hika.com.tr</a> adresine e-posta gönderebilirsiniz. Talepleriniz 30 gün içinde yanıtlanacaktır.</p>
+      <div class="step">
+        <strong>İletişim ve Yanıt Süresi:</strong><br>
+        Bu haklarınızı kullanmak için <a href="mailto:info@hika.com.tr">info@hika.com.tr</a> adresine e-posta gönderebilirsiniz. Talepleriniz 30 gün içinde yanıtlanacaktır.
+      </div>
 
-      <p><strong>Hesap Silme:</strong> Hesabınızı silmek için uygulama içinden Profil → Hesap Ayarları → Hesabı Sil seçeneğini kullanabilir veya yukarıdaki e-posta adresine başvurabilirsiniz. Hesap silindikten sonra tüm kişisel verileriniz kalıcı olarak silinir.</p>
+      <div class="step">
+        <strong>Hesap Silme:</strong><br>
+        Hesabınızı silmek için uygulama içinden Profil → Hesap Ayarları → Hesabı Sil seçeneğini kullanabilir veya yukarıdaki e-posta adresine başvurabilirsiniz. Hesap silindikten sonra tüm kişisel verileriniz kalıcı olarak silinir.
+      </div>
     </section>
 
     <p><a href="./index.html">Ana sayfaya dön</a></p>
