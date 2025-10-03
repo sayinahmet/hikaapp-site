@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Testing Instructions – Hi‑Ka Vehicle Management</title>
+  <style>
+    :root{
+      --overlay: rgba(0,0,0,.78);
+      --panelBg1: rgba(20,24,32,.94);
+      --panelBg2: rgba(20,24,32,.88);
+      --panelBorder: rgba(255,255,255,.10);
+      --panelFg: #f1f4f8; --panelMuted:#c7cfde;
+      --chipBg: rgba(255,255,255,.10); --chipBorder: rgba(255,255,255,.30);
+      --highlight: #ffd700;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; color:#fff; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      line-height:1.6;
+    }
+    .bg{
+      position:fixed; inset:0; z-index:-2;
+      background:url("./assets/background.png") center/cover no-repeat fixed;
+      filter:grayscale(.25) brightness(.38);
+    }
+    .bg::after{content:""; position:absolute; inset:0; background:var(--overlay);}
+    .wrap{max-width:900px; margin:0 auto; padding:80px 20px 40px}
+    .back{position:fixed; left:16px; top:16px; z-index:10}
+    .back a{
+      display:inline-block; padding:8px 12px; border-radius:10px;
+      background:var(--chipBg); border:1px solid var(--chipBorder);
+      color:#fff; text-decoration:none; backdrop-filter:blur(8px);
+    }
+    h1{margin:0 0 10px; text-shadow:0 3px 14px rgba(0,0,0,.55)}
+    h2{margin:26px 0 10px; font-size:20px}
+    p{margin:8px 0}
+    .box{
+      background:linear-gradient(180deg,var(--panelBg1),var(--panelBg2));
+      border:1px solid var(--panelBorder); border-radius:16px; padding:18px;
+      color:var(--panelFg); box-shadow:0 20px 40px rgba(0,0,0,.35);
+      backdrop-filter:blur(10px) saturate(140%);
+      margin:14px 0 22px;
+    }
+    .muted{color:var(--panelMuted)}
+    .highlight{
+      background: rgba(255,215,0,.15);
+      border-left: 3px solid var(--highlight);
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin: 12px 0;
+    }
+    .step{
+      background: rgba(255,255,255,.05);
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin: 8px 0;
+      border-left: 3px solid rgba(255,255,255,.3);
+    }
+    code{
+      background: rgba(0,0,0,.4);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+    }
+    a{color:#e8ecf8}
+  </style>
+  <script>function goBack(){ if(history.length>1) history.back(); else location.href="./index.html"; }</script>
+</head>
+<body>
+  <div class="bg"></div>
+
+  <div class="back"><a href="javascript:void(0)" onclick="goBack()">← Back</a></div>
+
+  <main class="wrap">
+    <h1>Testing Instructions for Google OAuth Review</h1>
+    <p class="muted">HikaApp - Vehicle Management System</p>
+
+    <section class="box">
+      <h2>📱 How to Access the App for Testing</h2>
+      <p><strong>Platform:</strong> iOS (TestFlight or App Store)</p>
+      <p><strong>App Name:</strong> HikaApp</p>
+      <p>The application is available on the iOS App Store. You can download it using the App Store link or TestFlight.</p>
+    </section>
+
+    <section class="box">
+      <h2>🔓 Demo Mode Access (Recommended for Testing)</h2>
+      
+      <div class="highlight">
+        <strong>⚠️ IMPORTANT:</strong> The app includes a hidden demo mode for testing purposes without requiring OAuth verification.
+      </div>
+
+      <p><strong>How to activate Demo Mode:</strong></p>
+      
+      <div class="step">
+        <strong>Step 1:</strong> Open the app and navigate to the Login screen
+      </div>
+
+      <div class="step">
+        <strong>Step 2:</strong> Tap the <strong>HikaApp logo 5 times</strong> (at the top of the login screen)
+      </div>
+
+      <div class="step">
+        <strong>Step 3:</strong> A hidden demo login form will appear
+      </div>
+
+      <div class="step">
+        <strong>Step 4:</strong> Use the following demo credentials:<br>
+        <code>Email: applereview@hikainsaat.com</code><br>
+        <code>Password: AppleDemo2025!</code>
+      </div>
+
+      <div class="step">
+        <strong>Step 5:</strong> Tap "Login" to access the app with <strong>Personnel role</strong>
+      </div>
+
+      <p><strong>Demo Mode Features:</strong></p>
+      <p>• Logs you in as a Personnel user (authorized to access Google APIs)</p>
+      <p>• Uses mock data for vehicle information and fuel records</p>
+      <p>• Demonstrates all app features including Google Sheets/Drive integration</p>
+      <p>• No real OAuth consent required (uses test data)</p>
+    </section>
+
+    <section class="box">
+      <h2>🔐 OAuth Login Flow (Optional Testing)</h2>
+      
+      <p>If you prefer to test the actual OAuth consent flow:</p>
+
+      <div class="step">
+        <strong>Step 1:</strong> Open the app and tap "Sign in with Google"
+      </div>
+
+      <div class="step">
+        <strong>Step 2:</strong> You'll see the OAuth consent screen requesting the following scopes:<br>
+        • <code>spreadsheets.readonly</code> - Read Google Sheets data<br>
+        • <code>drive.readonly</code> - Read Google Drive files<br>
+        • <code>profile</code> - Basic profile information<br>
+        • <code>email</code> - Email address
+      </div>
+
+      <div class="step">
+        <strong>Step 3:</strong> After granting permissions, you'll be logged in as a <strong>Guest user</strong> (default role)
+      </div>
+
+      <div class="step">
+        <strong>Step 4:</strong> Guest users have <strong>limited access</strong> and cannot access Google Sheets/Drive data
+      </div>
+
+      <p class="muted">Note: To test Google API scopes with OAuth login, you would need admin privileges to upgrade your role from Guest to Personnel. Demo mode bypasses this for testing.</p>
+    </section>
+
+    <section class="box">
+      <h2>👥 User Roles & Permissions</h2>
+      
+      <p><strong>Guest (Default for new OAuth users):</strong></p>
+      <p>• NO access to Google Sheets API</p>
+      <p>• NO access to Google Drive API</p>
+      <p>• Can only view basic app screens and contact information</p>
+
+      <p><strong>Personnel (Demo mode default):</strong></p>
+      <p>• ✅ Can query vehicle information using license plate search</p>
+      <p>• ✅ Can access Google Sheets data (vehicle records, fuel data)</p>
+      <p>• ✅ Can view vehicle documents from Google Drive</p>
+      <p>• ✅ Can view cost reports and analytics</p>
+      <p>• ❌ Cannot manage users or change roles</p>
+
+      <p><strong>Admin:</strong></p>
+      <p>• ✅ Full access to all features</p>
+      <p>• ✅ Can manage users and assign roles</p>
+      <p>• ✅ Can access all Google API scopes</p>
+    </section>
+
+    <section class="box">
+      <h2>🧪 What to Test</h2>
+      
+      <p><strong>Using Demo Mode (Personnel role):</strong></p>
+      
+      <p>1. <strong>Vehicle Search:</strong><br>
+      • Navigate to "Plaka Sorgulama" (Plate Search)<br>
+      • Enter a sample license plate (e.g., "06 ABC 123")<br>
+      • View vehicle information pulled from Google Sheets (mock data)</p>
+
+      <p>2. <strong>Cost Reports:</strong><br>
+      • Navigate to "Maliyet Raporları" (Cost Reports)<br>
+      • View fuel consumption and cost analytics<br>
+      • Data sourced from Google Sheets → BigQuery</p>
+
+      <p>3. <strong>Vehicle Documents:</strong><br>
+      • Browse vehicle files and documents<br>
+      • View PDFs from Google Drive (mock data)</p>
+
+      <p>4. <strong>AI Assistant:</strong><br>
+      • Test the AI-powered search and query features<br>
+      • Ask questions about vehicles and fuel records</p>
+    </section>
+
+    <section class="box">
+      <h2>🔒 Security & Privacy Verification</h2>
+      
+      <p><strong>What you can verify during testing:</strong></p>
+      
+      <p>✅ <strong>Role-Based Access Control:</strong><br>
+      If you log in via OAuth (not demo mode), you'll start as Guest with no Google API access</p>
+
+      <p>✅ <strong>Read-Only Scopes:</strong><br>
+      The app never modifies Google Sheets or Drive data, only reads</p>
+
+      <p>✅ <strong>Hard-Coded Resources:</strong><br>
+      The app only accesses specific, pre-defined spreadsheet and folder IDs</p>
+
+      <p>✅ <strong>Data Usage Transparency:</strong><br>
+      OAuth consent screen clearly explains what data is accessed and why</p>
+
+      <p>✅ <strong>Privacy Policy:</strong><br>
+      Comprehensive privacy policy available at <a href="https://apphika.com/privacy.html">https://apphika.com/privacy.html</a></p>
+    </section>
+
+    <section class="box">
+      <h2>📞 Contact for Questions</h2>
+      <p>If you have any questions or issues during testing:</p>
+      <p><strong>Email:</strong> <a href="mailto:info@hika.com.tr">info@hika.com.tr</a></p>
+      <p><strong>Developer:</strong> Ahmet Sayın</p>
+      <p><strong>Website:</strong> <a href="https://apphika.com">https://apphika.com</a></p>
+    </section>
+
+    <div class="highlight">
+      <strong>Summary:</strong> For fastest testing, use the hidden demo mode (tap logo 5 times on login screen) to access the app as a Personnel user with full Google API access using mock data.
+    </div>
+
+    <p><a href="./index.html">Return to homepage</a></p>
+  </main>
+</body>
+</html>
+
