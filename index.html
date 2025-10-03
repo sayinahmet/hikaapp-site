@@ -63,6 +63,13 @@
       filter:brightness(0) invert(1);
     }
     .card h2{display:flex; align-items:center}
+    .step{
+      background: rgba(255,255,255,.05);
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin: 8px 0;
+      border-left: 3px solid rgba(255,255,255,.3);
+    }
     @media (max-width:980px){ .grid{grid-template-columns:1fr} .hero h1{font-size:30px} }
   </style>
 </head>
@@ -139,10 +146,22 @@
       <h2>Veri Kullanımı ve Şeffaflık</h2>
       <div class="card">
         <h3>Google Services Entegrasyonu</h3>
-        <p><strong>Google Sheets API:</strong> Araç verilerinin gerçek zamanlı senkronizasyonu için kullanılır. Plaka bilgileri, yakıt kayıtları ve maliyet verileri Google Sheets'ten güvenli bir şekilde çekilir.</p>
-        <p><strong>Google Drive API:</strong> Araç belgelerinin (ruhsat, sigorta, bakım kayıtları) güvenli depolanması ve erişimi için kullanılır. Dosyalar şifrelenerek iletilir.</p>
-        <p><strong>Firebase Authentication:</strong> Kullanıcı kimlik doğrulama ve oturum yönetimi. Sadece yetkili HİKA İnşaat personeli erişebilir.</p>
-        <p><strong>Google Generative AI:</strong> AI asistan özelliği için doğal dil işleme. Kullanıcı sorguları işlenir, kişisel veriler saklanmaz.</p>
+        
+        <div class="step">
+          <strong>Google Sheets API:</strong> Araç verilerinin gerçek zamanlı senkronizasyonu için kullanılır. Plaka bilgileri, yakıt kayıtları ve maliyet verileri Google Sheets'ten güvenli bir şekilde çekilir.
+        </div>
+
+        <div class="step">
+          <strong>Google Drive API:</strong> Araç belgelerinin (ruhsat, sigorta, bakım kayıtları) güvenli depolanması ve erişimi için kullanılır. Dosyalar şifrelenerek iletilir.
+        </div>
+
+        <div class="step">
+          <strong>Firebase Authentication:</strong> Kullanıcı kimlik doğrulama ve oturum yönetimi. Sadece yetkili HİKA İnşaat personeli erişebilir.
+        </div>
+
+        <div class="step">
+          <strong>Google Generative AI:</strong> AI asistan özelliği için doğal dil işleme. Kullanıcı sorguları işlenir, kişisel veriler saklanmaz.
+        </div>
       </div>
     </section>
 
