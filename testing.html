@@ -75,13 +75,13 @@
 
   <main class="wrap">
     <h1>Testing Instructions for Google OAuth Review</h1>
-    <p class="muted">HikaApp - Vehicle Management System</p>
+    <p class="muted">Hi-Ka Araç Yönetimi - Vehicle Management System</p>
 
     <section class="box">
       <h2>How to Access the App for Testing</h2>
-      <p><strong>Platform:</strong> iOS (TestFlight or App Store)</p>
-      <p><strong>App Name:</strong> HikaApp</p>
-      <p>The application is available on the iOS App Store. You can download it using the App Store link or TestFlight.</p>
+      <p><strong>Platform:</strong> iOS App Store</p>
+      <p><strong>App Name:</strong> Hi-Ka Araç Yönetimi</p>
+      <p>The application is available on the iOS App Store.</p>
     </section>
 
     <section class="box">
@@ -98,7 +98,7 @@
       </div>
 
       <div class="step">
-        <strong>Step 2:</strong> Tap the <strong>HikaApp logo 5 times</strong> (at the top of the login screen)
+        <strong>Step 2:</strong> Tap the <strong>HİKA logo 5 times</strong> (at the top of the login screen)
       </div>
 
       <div class="step">
@@ -153,22 +153,28 @@
     <section class="box">
       <h2>User Roles & Permissions</h2>
       
-      <p><strong>Guest (Default for new OAuth users):</strong></p>
-      <p>• NO access to Google Sheets API</p>
-      <p>• NO access to Google Drive API</p>
-      <p>• Can only view basic app screens and contact information</p>
+      <div class="step">
+        <strong>Guest (Default for new OAuth users):</strong><br>
+        • NO access to Google Sheets API<br>
+        • NO access to Google Drive API<br>
+        • Can only view basic app screens and contact information
+      </div>
 
-      <p><strong>Personnel (Demo mode default):</strong></p>
-      <p>• Can query vehicle information using license plate search</p>
-      <p>• Can access Google Sheets data (vehicle records, fuel data)</p>
-      <p>• Can view vehicle documents from Google Drive</p>
-      <p>• Can view cost reports and analytics</p>
-      <p>• Cannot manage users or change roles</p>
+      <div class="step">
+        <strong>Personnel (Demo mode default):</strong><br>
+        • Can query vehicle information using license plate search<br>
+        • Can access Google Sheets data (vehicle records, fuel data)<br>
+        • Can view vehicle documents from Google Drive<br>
+        • Can view cost reports and analytics<br>
+        • Cannot manage users or change roles
+      </div>
 
-      <p><strong>Admin:</strong></p>
-      <p>• Full access to all features</p>
-      <p>• Can manage users and assign roles</p>
-      <p>• Can access all Google API scopes</p>
+      <div class="step">
+        <strong>Admin:</strong><br>
+        • Full access to all features<br>
+        • Can manage users and assign roles<br>
+        • Can access all Google API scopes
+      </div>
     </section>
 
     <section class="box">
@@ -187,20 +193,26 @@
       
       <p><strong>Using Demo Mode (Personnel role):</strong></p>
       
-      <p>1. <strong>Vehicle Search (Plaka Sorgulama):</strong><br>
-      • Navigate to "Plaka Sorgulama" from the main menu<br>
-      • Enter the test license plate: <code>06DEMO123</code><br>
-      • The app will display mock vehicle information from Google Sheets</p>
+      <div class="step">
+        <strong>1. Vehicle Search (Plaka Sorgulama):</strong><br>
+        • Navigate to "Plaka Sorgulama" from the main menu<br>
+        • Enter the test license plate: <code>06DEMO123</code><br>
+        • The app will display mock vehicle information from Google Sheets
+      </div>
 
-      <p>2. <strong>Cost Reports (Maliyet Raporları):</strong><br>
-      • Navigate to "Maliyet Raporları" from the main menu<br>
-      • Reports auto-load immediately upon opening<br>
-      • View fuel consumption charts and cost analytics</p>
+      <div class="step">
+        <strong>2. Cost Reports (Maliyet Raporları):</strong><br>
+        • Navigate to "Maliyet Raporları" from the main menu<br>
+        • Reports auto-load immediately upon opening<br>
+        • View fuel consumption charts and cost analytics
+      </div>
 
-      <p>3. <strong>AI Assistant (AI Asistan):</strong><br>
-      • Navigate to "AI Asistan" from the main menu<br>
-      • Try the example query: <code>06DEMO123 araç bilgileri</code><br>
-      • The AI will respond with vehicle information using natural language</p>
+      <div class="step">
+        <strong>3. AI Assistant (AI Asistan):</strong><br>
+        • Navigate to "AI Asistan" from the main menu<br>
+        • Try the example query: <code>06DEMO123 araç bilgileri</code><br>
+        • The AI will respond with vehicle information using natural language
+      </div>
     </section>
 
     <section class="box">
@@ -208,20 +220,30 @@
       
       <p><strong>What you can verify during testing:</strong></p>
       
-      <p><strong>Role-Based Access Control:</strong><br>
-      If you log in via OAuth (not demo mode), you'll start as Guest with no Google API access</p>
+      <div class="step">
+        <strong>Role-Based Access Control:</strong><br>
+        If you log in via OAuth (not demo mode), you'll start as Guest with no Google API access
+      </div>
 
-      <p><strong>Read-Only Scopes:</strong><br>
-      The app never modifies Google Sheets or Drive data, only reads</p>
+      <div class="step">
+        <strong>Read-Only Scopes:</strong><br>
+        The app never modifies Google Sheets or Drive data, only reads
+      </div>
 
-      <p><strong>Hard-Coded Resources:</strong><br>
-      The app only accesses specific, pre-defined spreadsheet and folder IDs</p>
+      <div class="step">
+        <strong>Hard-Coded Resources:</strong><br>
+        The app only accesses specific, pre-defined spreadsheet and folder IDs
+      </div>
 
-      <p><strong>Data Usage Transparency:</strong><br>
-      OAuth consent screen clearly explains what data is accessed and why</p>
+      <div class="step">
+        <strong>Data Usage Transparency:</strong><br>
+        OAuth consent screen clearly explains what data is accessed and why
+      </div>
 
-      <p><strong>Privacy Policy:</strong><br>
-      Comprehensive privacy policy available at <a href="https://apphika.com/privacy.html">https://apphika.com/privacy.html</a></p>
+      <div class="step">
+        <strong>Privacy Policy:</strong><br>
+        Comprehensive privacy policy available at <a href="https://apphika.com/privacy.html">https://apphika.com/privacy.html</a>
+      </div>
     </section>
 
     <section class="box">
