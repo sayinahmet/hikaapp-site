@@ -42,6 +42,13 @@
       margin:14px 0 22px; /* kartlar arası boşluk */
     }
     .muted{color:var(--panelMuted)}
+    .step{
+      background: rgba(255,255,255,.05);
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin: 8px 0;
+      border-left: 3px solid rgba(255,255,255,.3);
+    }
     a{color:#e8ecf8}
   </style>
   <script>function goBack(){ if(history.length>1) history.back(); else location.href="./index.html"; }</script>
@@ -63,32 +70,74 @@
 
     <section class="box">
       <h2>Kullanım Hakları</h2>
-      <p>• Uygulama sadece yetkili HİKA İnşaat personeli tarafından kullanılabilir</p>
-      <p>• Kullanıcılar Google hesapları ile kimlik doğrulama yaparlar</p>
-      <p>• Erişim izinleri rol bazlı olarak (Admin, Personel, Misafir) yönetilir</p>
-      <p>• Şirket dışı kullanım yasaktır</p>
+      
+      <div class="step">
+        Uygulama sadece yetkili HİKA İnşaat personeli tarafından kullanılabilir
+      </div>
+
+      <div class="step">
+        Kullanıcılar Google hesapları ile kimlik doğrulama yaparlar
+      </div>
+
+      <div class="step">
+        Erişim izinleri rol bazlı olarak (Admin, Personel, Misafir) yönetilir
+      </div>
+
+      <div class="step">
+        Şirket dışı kullanım yasaktır
+      </div>
     </section>
 
     <section class="box">
       <h2>Kullanıcı Sorumlulukları</h2>
-      <p>• Hesap bilgilerini güvende tutmak</p>
-      <p>• Uygulamayı amacına uygun kullanmak</p>
-      <p>• Şirket verilerini korumak ve paylaşmamak</p>
-      <p>• Sistemi kötüye kullanmamak</p>
+      
+      <div class="step">
+        Hesap bilgilerini güvende tutmak
+      </div>
+
+      <div class="step">
+        Uygulamayı amacına uygun kullanmak
+      </div>
+
+      <div class="step">
+        Şirket verilerini korumak ve paylaşmamak
+      </div>
+
+      <div class="step">
+        Sistemi kötüye kullanmamak
+      </div>
     </section>
 
     <section class="box">
       <h2>Veri Güvenliği</h2>
-      <p>• Tüm veriler HTTPS ile şifrelenerek iletilir</p>
-      <p>• Google servisleri (Sheets, Drive, Firebase) güvenli entegrasyon için kullanılır</p>
-      <p>• Kullanıcı verileri şirket içi kalır, üçüncü taraflarla paylaşılmaz</p>
+      
+      <div class="step">
+        Tüm veriler HTTPS ile şifrelenerek iletilir
+      </div>
+
+      <div class="step">
+        Google servisleri (Sheets, Drive, Firebase) güvenli entegrasyon için kullanılır
+      </div>
+
+      <div class="step">
+        Kullanıcı verileri şirket içi kalır, üçüncü taraflarla paylaşılmaz
+      </div>
     </section>
 
     <section class="box">
       <h2>Hizmet Sınırlamaları</h2>
-      <p>• Uygulama "olduğu gibi" sunulur</p>
-      <p>• HİKA İnşaat kesinti veya veri kaybından sorumlu değildir</p>
-      <p>• Servis kullanılabilirliği garanti edilmez</p>
+      
+      <div class="step">
+        Uygulama "olduğu gibi" sunulur
+      </div>
+
+      <div class="step">
+        HİKA İnşaat kesinti veya veri kaybından sorumlu değildir
+      </div>
+
+      <div class="step">
+        Servis kullanılabilirliği garanti edilmez
+      </div>
     </section>
 
     <section class="box">
@@ -98,10 +147,18 @@
 
     <section class="box">
       <h2>İletişim</h2>
-      <p>Kullanım koşulları hakkında sorularınız için: <a href="mailto:info@hika.com.tr">info@hika.com.tr</a></p>
-      <p>HİKA İnşaat ve Taahhüt Ltd. Şti.<br>
-      Palmiye Mah. Adnan Menderes Blv. Nihal Apt. No: 22 İç Kapı No: 1<br>
-      Yenişehir/Mersin, Türkiye</p>
+      
+      <div class="step">
+        <strong>E-posta:</strong> <a href="mailto:info@hika.com.tr">info@hika.com.tr</a><br>
+        Kullanım koşulları hakkında sorularınız için
+      </div>
+
+      <div class="step">
+        <strong>Adres:</strong><br>
+        HİKA İnşaat ve Taahhüt Ltd. Şti.<br>
+        Palmiye Mah. Adnan Menderes Blv. Nihal Apt. No: 22 İç Kapı No: 1<br>
+        Yenişehir/Mersin, Türkiye
+      </div>
     </section>
 
     <p><a href="./index.html">Ana sayfaya dön</a></p>
