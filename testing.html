@@ -78,17 +78,17 @@
     <p class="muted">HikaApp - Vehicle Management System</p>
 
     <section class="box">
-      <h2>📱 How to Access the App for Testing</h2>
+      <h2>How to Access the App for Testing</h2>
       <p><strong>Platform:</strong> iOS (TestFlight or App Store)</p>
       <p><strong>App Name:</strong> HikaApp</p>
       <p>The application is available on the iOS App Store. You can download it using the App Store link or TestFlight.</p>
     </section>
 
     <section class="box">
-      <h2>🔓 Demo Mode Access (Recommended for Testing)</h2>
+      <h2>Demo Mode Access (Recommended for Testing)</h2>
       
       <div class="highlight">
-        <strong>⚠️ IMPORTANT:</strong> The app includes a hidden demo mode for testing purposes without requiring OAuth verification.
+        <strong>IMPORTANT:</strong> The app includes a hidden demo mode for testing purposes without requiring OAuth verification.
       </div>
 
       <p><strong>How to activate Demo Mode:</strong></p>
@@ -123,7 +123,7 @@
     </section>
 
     <section class="box">
-      <h2>🔐 OAuth Login Flow (Optional Testing)</h2>
+      <h2>OAuth Login Flow (Optional Testing)</h2>
       
       <p>If you prefer to test the actual OAuth consent flow:</p>
 
@@ -151,7 +151,7 @@
     </section>
 
     <section class="box">
-      <h2>👥 User Roles & Permissions</h2>
+      <h2>User Roles & Permissions</h2>
       
       <p><strong>Guest (Default for new OAuth users):</strong></p>
       <p>• NO access to Google Sheets API</p>
@@ -159,65 +159,80 @@
       <p>• Can only view basic app screens and contact information</p>
 
       <p><strong>Personnel (Demo mode default):</strong></p>
-      <p>• ✅ Can query vehicle information using license plate search</p>
-      <p>• ✅ Can access Google Sheets data (vehicle records, fuel data)</p>
-      <p>• ✅ Can view vehicle documents from Google Drive</p>
-      <p>• ✅ Can view cost reports and analytics</p>
-      <p>• ❌ Cannot manage users or change roles</p>
+      <p>• Can query vehicle information using license plate search</p>
+      <p>• Can access Google Sheets data (vehicle records, fuel data)</p>
+      <p>• Can view vehicle documents from Google Drive</p>
+      <p>• Can view cost reports and analytics</p>
+      <p>• Cannot manage users or change roles</p>
 
       <p><strong>Admin:</strong></p>
-      <p>• ✅ Full access to all features</p>
-      <p>• ✅ Can manage users and assign roles</p>
-      <p>• ✅ Can access all Google API scopes</p>
+      <p>• Full access to all features</p>
+      <p>• Can manage users and assign roles</p>
+      <p>• Can access all Google API scopes</p>
     </section>
 
     <section class="box">
-      <h2>🧪 What to Test</h2>
+      <h2>Demo Video</h2>
+      
+      <div class="highlight">
+        <strong>Quick Demo:</strong> Watch a 2-minute walkthrough of the app<br>
+        <a href="https://youtube.com/shorts/yz7hD9M0Dpc" target="_blank" style="color:#4da6ff; font-size:1.1em">View Demo Video on YouTube (2:14 minutes)</a>
+      </div>
+
+      <p>The video demonstrates the demo login process and main features including vehicle search, cost reports, and AI assistant.</p>
+    </section>
+
+    <section class="box">
+      <h2>What to Test</h2>
       
       <p><strong>Using Demo Mode (Personnel role):</strong></p>
       
-      <p>1. <strong>Vehicle Search:</strong><br>
-      • Navigate to "Plaka Sorgulama" (Plate Search)<br>
-      • Enter a sample license plate (e.g., "06 ABC 123")<br>
-      • View vehicle information pulled from Google Sheets (mock data)</p>
+      <p>1. <strong>Vehicle Search (Plaka Sorgulama):</strong><br>
+      • Navigate to "Plaka Sorgulama" from the main menu<br>
+      • Enter the test license plate: <code>06DEMO123</code><br>
+      • The app will display mock vehicle information from Google Sheets<br>
+      • You can also try other formats: <code>06 DEMO 123</code> or <code>06-DEMO-123</code></p>
 
-      <p>2. <strong>Cost Reports:</strong><br>
-      • Navigate to "Maliyet Raporları" (Cost Reports)<br>
-      • View fuel consumption and cost analytics<br>
-      • Data sourced from Google Sheets → BigQuery</p>
+      <p>2. <strong>Cost Reports (Maliyet Raporları):</strong><br>
+      • Navigate to "Maliyet Raporları" from the main menu<br>
+      • Reports auto-load immediately upon opening<br>
+      • View fuel consumption charts and cost analytics<br>
+      • Data is sourced from Google Sheets → BigQuery (demo data)</p>
 
-      <p>3. <strong>Vehicle Documents:</strong><br>
+      <p>3. <strong>AI Assistant (AI Asistan):</strong><br>
+      • Navigate to "AI Asistan" from the main menu<br>
+      • Try the example query: <code>06DEMO123 araç bilgileri</code><br>
+      • Or ask: "Bu aracın yakıt tüketimi nedir?"<br>
+      • The AI will respond with vehicle information using natural language</p>
+
+      <p>4. <strong>Vehicle Documents:</strong><br>
       • Browse vehicle files and documents<br>
-      • View PDFs from Google Drive (mock data)</p>
-
-      <p>4. <strong>AI Assistant:</strong><br>
-      • Test the AI-powered search and query features<br>
-      • Ask questions about vehicles and fuel records</p>
+      • View sample PDFs from Google Drive (mock data)</p>
     </section>
 
     <section class="box">
-      <h2>🔒 Security & Privacy Verification</h2>
+      <h2>Security & Privacy Verification</h2>
       
       <p><strong>What you can verify during testing:</strong></p>
       
-      <p>✅ <strong>Role-Based Access Control:</strong><br>
+      <p><strong>Role-Based Access Control:</strong><br>
       If you log in via OAuth (not demo mode), you'll start as Guest with no Google API access</p>
 
-      <p>✅ <strong>Read-Only Scopes:</strong><br>
+      <p><strong>Read-Only Scopes:</strong><br>
       The app never modifies Google Sheets or Drive data, only reads</p>
 
-      <p>✅ <strong>Hard-Coded Resources:</strong><br>
+      <p><strong>Hard-Coded Resources:</strong><br>
       The app only accesses specific, pre-defined spreadsheet and folder IDs</p>
 
-      <p>✅ <strong>Data Usage Transparency:</strong><br>
+      <p><strong>Data Usage Transparency:</strong><br>
       OAuth consent screen clearly explains what data is accessed and why</p>
 
-      <p>✅ <strong>Privacy Policy:</strong><br>
+      <p><strong>Privacy Policy:</strong><br>
       Comprehensive privacy policy available at <a href="https://apphika.com/privacy.html">https://apphika.com/privacy.html</a></p>
     </section>
 
     <section class="box">
-      <h2>📞 Contact for Questions</h2>
+      <h2>Contact for Questions</h2>
       <p>If you have any questions or issues during testing:</p>
       <p><strong>Email:</strong> <a href="mailto:info@hika.com.tr">info@hika.com.tr</a></p>
       <p><strong>Developer:</strong> Ahmet Sayın</p>
