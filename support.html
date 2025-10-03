@@ -28,6 +28,13 @@
       box-shadow:0 20px 40px rgba(0,0,0,.35); backdrop-filter:blur(10px) saturate(140%);
     }
     .muted{color:var(--panelMuted)}
+    .step{
+      background: rgba(255,255,255,.05);
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin: 8px 0;
+      border-left: 3px solid rgba(255,255,255,.3);
+    }
     a{color:#e8ecf8; text-decoration:underline}
   </style>
   <script>function goBack(){ if(history.length>1) history.back(); else location.href="./index.html"; }</script>
@@ -43,21 +50,43 @@
 
     <section class="box">
       <h2>İletişim</h2>
-      <p>E‑posta: <a href="mailto:info@hika.com.tr">info@hika.com.tr</a></p>
-      <p>Çalışma saatleri: Hafta içi 09:00–18:00 (TRT)</p>
+      
+      <div class="step">
+        <strong>E-posta:</strong> <a href="mailto:info@hika.com.tr">info@hika.com.tr</a>
+      </div>
+
+      <div class="step">
+        <strong>Çalışma Saatleri:</strong> Hafta içi 09:00–18:00 (TRT)
+      </div>
     </section>
 
-    <h2>Destek Kapsamı</h2>
     <section class="box">
-      <p>• Hesap ve erişim sorunları (Google ile giriş)</p>
-      <p>• Veri senkronizasyonu (Google Sheets/Drive)</p>
-      <p>• Belge görüntüleme ve raporlama</p>
-      <p>• Performans ve sürüm güncellemeleri</p>
+      <h2>Destek Kapsamı</h2>
+      
+      <div class="step">
+        <strong>Hesap ve Erişim:</strong> Google ile giriş sorunları, oturum yönetimi
+      </div>
+
+      <div class="step">
+        <strong>Veri Senkronizasyonu:</strong> Google Sheets ve Drive bağlantı sorunları
+      </div>
+
+      <div class="step">
+        <strong>Özellikler:</strong> Belge görüntüleme, raporlama ve analiz araçları
+      </div>
+
+      <div class="step">
+        <strong>Güncellemeler:</strong> Performans iyileştirmeleri ve yeni sürümler
+      </div>
     </section>
 
-    <h2>Sistem Gereksinimleri</h2>
     <section class="box">
-      <p>iOS 15.1 ve üzeri iPhone/iPad.</p>
+      <h2>Sistem Gereksinimleri</h2>
+      
+      <div class="step">
+        <strong>Platform:</strong> iOS 15.1 ve üzeri<br>
+        <strong>Cihazlar:</strong> iPhone ve iPad
+      </div>
     </section>
 
     <p><a href="./index.html">Ana sayfaya dön</a></p>
