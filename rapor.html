@@ -279,12 +279,12 @@
     
     // Button zoom controls
     function zoomIn() {
-      scale = Math.min(scale + 0.1, 5);
+      scale = Math.min(scale + 0.25, 5);
       updateZoom();
     }
     
     function zoomOut() {
-      scale = Math.max(scale - 0.1, 0.1);
+      scale = Math.max(scale - 0.25, 0.05);
       updateZoom();
     }
     
@@ -306,14 +306,31 @@
       }
     }, { passive: false, capture: true });
     
+    // Also catch touchstart on overlay itself
+    overlay.addEventListener('touchstart', function(e) {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        e.stopPropagation();
+        touching = true;
+        initialDistance = getDistance(e.touches[0], e.touches[1]);
+        lastScale = scale;
+      }
+    }, { passive: false });
+    
     // Handle zoom on overlay when active
     overlay.addEventListener('touchmove', function(e) {
-      if (e.touches.length === 2 && touching) {
+      if (e.touches.length === 2) {
+        if (!touching) {
+          // Started with 1 finger, added second during move
+          touching = true;
+          initialDistance = getDistance(e.touches[0], e.touches[1]);
+          lastScale = scale;
+        }
         e.preventDefault();
         e.stopPropagation();
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
         const newScale = lastScale * (currentDistance / initialDistance);
-        scale = Math.min(Math.max(0.1, newScale), 5);
+        scale = Math.min(Math.max(0.05, newScale), 5);
         updateZoom();
       }
     }, { passive: false });
