@@ -162,15 +162,7 @@
       z-index: 10;
       pointer-events: auto;
       background: transparent;
-      touch-action: pan-x pan-y;
-    }
-    
-    .touch-overlay.zooming {
       touch-action: none;
-    }
-    
-    .touch-overlay.disabled {
-      pointer-events: none;
     }
     
     /* Loading */
@@ -282,45 +274,67 @@
       updateZoom();
     }
     
-    // Pinch to zoom - start disabled, enable on 2 fingers
+    // Pinch to zoom - overlay always active
     let touching = false;
+    let lastTouchCount = 0;
     
-    // Start with overlay disabled (allow iframe interaction)
-    overlay.classList.add('disabled');
-    
-    // Detect 2-finger touch globally to activate overlay
-    document.addEventListener('touchstart', function(e) {
+    overlay.addEventListener('touchstart', function(e) {
+      lastTouchCount = e.touches.length;
+      
       if (e.touches.length === 2) {
-        // Activate overlay immediately
-        overlay.classList.remove('disabled');
-        overlay.classList.add('zooming');
+        // Two fingers - zoom mode
+        e.preventDefault();
+        e.stopPropagation();
         touching = true;
         initialDistance = getDistance(e.touches[0], e.touches[1]);
         lastScale = scale;
-        e.preventDefault();
-      } else {
-        // 1 finger - keep overlay disabled
-        overlay.classList.add('disabled');
+      } else if (e.touches.length === 1) {
+        // One finger - pass through to iframe by temporarily hiding overlay
+        overlay.style.pointerEvents = 'none';
+        
+        // Forward the touch to iframe
+        setTimeout(() => {
+          overlay.style.pointerEvents = 'auto';
+        }, 10);
       }
-    }, { passive: false, capture: true });
+    }, { passive: false });
     
-    document.addEventListener('touchmove', function(e) {
-      if (e.touches.length === 2 && touching) {
+    overlay.addEventListener('touchmove', function(e) {
+      if (e.touches.length === 2) {
+        if (!touching) {
+          // Second finger added during move
+          touching = true;
+          initialDistance = getDistance(e.touches[0], e.touches[1]);
+          lastScale = scale;
+        }
         e.preventDefault();
+        e.stopPropagation();
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
         const newScale = lastScale * (currentDistance / initialDistance);
         scale = Math.min(Math.max(0.1, newScale), 5);
         updateZoom();
       }
-    }, { passive: false, capture: true });
+    }, { passive: false });
     
-    document.addEventListener('touchend', function(e) {
+    overlay.addEventListener('touchend', function(e) {
       if (e.touches.length < 2) {
         touching = false;
-        overlay.classList.remove('zooming');
-        overlay.classList.add('disabled');
+        lastTouchCount = e.touches.length;
       }
-    }, { passive: false, capture: true });
+    }, { passive: false });
+    
+    // Prevent default pinch zoom on document
+    document.addEventListener('gesturestart', function(e) {
+      e.preventDefault();
+    });
+    
+    document.addEventListener('gesturechange', function(e) {
+      e.preventDefault();
+    });
+    
+    document.addEventListener('gestureend', function(e) {
+      e.preventDefault();
+    });
     
     function getDistance(touch1, touch2) {
       const dx = touch1.clientX - touch2.clientX;
