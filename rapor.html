@@ -140,8 +140,7 @@
     .doc-wrapper {
       width: 100%;
       height: 100%;
-      transform-origin: center center;
-      transition: none;
+      transform-origin: 0 0;
       position: relative;
     }
     
@@ -264,21 +263,12 @@
     const zoomLevelDisplay = document.getElementById('zoomLevel');
     
     function updateZoom() {
-      // Simply apply scale
+      // Set wrapper size inversely to scale
+      wrapper.style.width = `${100 / scale}%`;
+      wrapper.style.height = `${100 / scale}%`;
+      
+      // Apply scale transform
       wrapper.style.transform = `scale(${scale})`;
-      
-      // Create scroll area by adjusting container padding
-      const viewportWidth = container.clientWidth;
-      const viewportHeight = container.clientHeight;
-      
-      if (scale !== 1) {
-        // Add padding to create scrollable area
-        const paddingX = Math.abs((viewportWidth * scale - viewportWidth) / 2);
-        const paddingY = Math.abs((viewportHeight * scale - viewportHeight) / 2);
-        container.style.padding = `${paddingY}px ${paddingX}px`;
-      } else {
-        container.style.padding = '0';
-      }
       
       zoomLevelDisplay.textContent = Math.round(scale * 100) + '%';
     }
@@ -294,29 +284,31 @@
       updateZoom();
     }
     
-    // Simple pinch zoom
+    // Pinch zoom system
     let touching = false;
     
     overlay.addEventListener('touchstart', function(e) {
       if (e.touches.length === 2) {
-        // Two fingers - zoom
+        // Two fingers detected - zoom mode
         e.preventDefault();
+        e.stopPropagation();
         touching = true;
         initialDistance = getDistance(e.touches[0], e.touches[1]);
         lastScale = scale;
       } else if (e.touches.length === 1) {
-        // One finger - hide overlay instantly
+        // One finger - disable overlay for container scroll
         overlay.style.pointerEvents = 'none';
-        // Restore immediately  
-        requestAnimationFrame(() => {
+        // Re-enable after a short delay to allow scroll to start
+        setTimeout(() => {
           overlay.style.pointerEvents = 'auto';
-        });
+        }, 100);
       }
     }, { passive: false });
     
     overlay.addEventListener('touchmove', function(e) {
       if (e.touches.length === 2 && touching) {
         e.preventDefault();
+        e.stopPropagation();
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
         const newScale = lastScale * (currentDistance / initialDistance);
         scale = Math.min(Math.max(0.1, newScale), 5);
