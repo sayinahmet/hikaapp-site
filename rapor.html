@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=0.25, maximum-scale=5.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=0.1, maximum-scale=5.0" />
   <title>Raporlar – Hi‑Ka Araç Yönetimi</title>
   <link rel="icon" href="./assets/logo-120.png" type="image/png">
   <style>
@@ -248,12 +248,12 @@
     
     // Button zoom controls
     function zoomIn() {
-      scale = Math.min(scale + 0.25, 5);
+      scale = Math.min(scale + 0.1, 5);
       updateZoom();
     }
     
     function zoomOut() {
-      scale = Math.max(scale - 0.25, 0.25);
+      scale = Math.max(scale - 0.1, 0.1);
       updateZoom();
     }
     
@@ -274,7 +274,7 @@
         e.preventDefault();
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
         scale = lastScale * (currentDistance / initialDistance);
-        scale = Math.min(Math.max(0.25, scale), 5);
+        scale = Math.min(Math.max(0.1, scale), 5);
         updateZoom();
       }
     }, { passive: false });
