@@ -160,9 +160,13 @@
       right: 0;
       bottom: 0;
       z-index: 10;
-      pointer-events: auto;
+      pointer-events: none;
       background: transparent;
       touch-action: none;
+    }
+    
+    .touch-overlay.active {
+      pointer-events: auto;
     }
     
     /* Loading */
@@ -274,39 +278,42 @@
       updateZoom();
     }
     
-    // Pinch to zoom - overlay always active
+    // Pinch to zoom - activate overlay only for 2 fingers
     let touching = false;
-    let lastTouchCount = 0;
+    let isZooming = false;
     
-    overlay.addEventListener('touchstart', function(e) {
-      lastTouchCount = e.touches.length;
-      
+    // Listen on body AND container to detect 2-finger touch everywhere
+    function handleTwoFingerStart(e) {
       if (e.touches.length === 2) {
-        // Two fingers - zoom mode
+        // Activate overlay for zoom
+        isZooming = true;
+        touching = true;
+        overlay.classList.add('active');
+        initialDistance = getDistance(e.touches[0], e.touches[1]);
+        lastScale = scale;
         e.preventDefault();
         e.stopPropagation();
+      } else if (e.touches.length === 1 && !isZooming) {
+        // Keep overlay disabled for 1-finger gestures
+        overlay.classList.remove('active');
+      }
+    }
+    
+    document.body.addEventListener('touchstart', handleTwoFingerStart, { passive: false, capture: true });
+    container.addEventListener('touchstart', handleTwoFingerStart, { passive: false, capture: true });
+    
+    // Zoom on overlay when active
+    overlay.addEventListener('touchstart', function(e) {
+      if (e.touches.length === 2) {
         touching = true;
         initialDistance = getDistance(e.touches[0], e.touches[1]);
         lastScale = scale;
-      } else if (e.touches.length === 1) {
-        // One finger - pass through to iframe by temporarily hiding overlay
-        overlay.style.pointerEvents = 'none';
-        
-        // Forward the touch to iframe
-        setTimeout(() => {
-          overlay.style.pointerEvents = 'auto';
-        }, 10);
+        e.preventDefault();
       }
     }, { passive: false });
     
     overlay.addEventListener('touchmove', function(e) {
-      if (e.touches.length === 2) {
-        if (!touching) {
-          // Second finger added during move
-          touching = true;
-          initialDistance = getDistance(e.touches[0], e.touches[1]);
-          lastScale = scale;
-        }
+      if (e.touches.length === 2 && touching) {
         e.preventDefault();
         e.stopPropagation();
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
@@ -319,9 +326,20 @@
     overlay.addEventListener('touchend', function(e) {
       if (e.touches.length < 2) {
         touching = false;
-        lastTouchCount = e.touches.length;
       }
     }, { passive: false });
+    
+    // Deactivate overlay when touch ends
+    function handleTouchEnd(e) {
+      if (e.touches.length < 2) {
+        isZooming = false;
+        touching = false;
+        overlay.classList.remove('active');
+      }
+    }
+    
+    document.body.addEventListener('touchend', handleTouchEnd, { passive: false, capture: true });
+    container.addEventListener('touchend', handleTouchEnd, { passive: false, capture: true });
     
     // Prevent default pinch zoom on document
     document.addEventListener('gesturestart', function(e) {
