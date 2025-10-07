@@ -160,13 +160,17 @@
       right: 0;
       bottom: 0;
       z-index: 10;
-      pointer-events: none;
+      pointer-events: auto;
       background: transparent;
+      touch-action: pan-x pan-y;
+    }
+    
+    .touch-overlay.zooming {
       touch-action: none;
     }
     
-    .touch-overlay.active {
-      pointer-events: auto;
+    .touch-overlay.disabled {
+      pointer-events: none;
     }
     
     /* Loading */
@@ -278,37 +282,29 @@
       updateZoom();
     }
     
-    // Pinch to zoom
+    // Pinch to zoom - start disabled, enable on 2 fingers
     let touching = false;
-    let zoomMode = false;
     
-    // Detect 2-finger touch globally (before it reaches iframe)
-    document.body.addEventListener('touchstart', function(e) {
+    // Start with overlay disabled (allow iframe interaction)
+    overlay.classList.add('disabled');
+    
+    // Detect 2-finger touch globally to activate overlay
+    document.addEventListener('touchstart', function(e) {
       if (e.touches.length === 2) {
-        // Enable overlay immediately to intercept touches
-        zoomMode = true;
+        // Activate overlay immediately
+        overlay.classList.remove('disabled');
+        overlay.classList.add('zooming');
         touching = true;
-        overlay.classList.add('active');
         initialDistance = getDistance(e.touches[0], e.touches[1]);
         lastScale = scale;
         e.preventDefault();
+      } else {
+        // 1 finger - keep overlay disabled
+        overlay.classList.add('disabled');
       }
     }, { passive: false, capture: true });
     
-    // Also listen on container
-    container.addEventListener('touchstart', function(e) {
-      if (e.touches.length === 2) {
-        zoomMode = true;
-        touching = true;
-        overlay.classList.add('active');
-        initialDistance = getDistance(e.touches[0], e.touches[1]);
-        lastScale = scale;
-        e.preventDefault();
-      }
-    }, { passive: false, capture: true });
-    
-    // Handle zoom gesture globally
-    document.body.addEventListener('touchmove', function(e) {
+    document.addEventListener('touchmove', function(e) {
       if (e.touches.length === 2 && touching) {
         e.preventDefault();
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
@@ -318,11 +314,11 @@
       }
     }, { passive: false, capture: true });
     
-    document.body.addEventListener('touchend', function(e) {
-      if (e.touches.length < 2 && zoomMode) {
+    document.addEventListener('touchend', function(e) {
+      if (e.touches.length < 2) {
         touching = false;
-        zoomMode = false;
-        overlay.classList.remove('active');
+        overlay.classList.remove('zooming');
+        overlay.classList.add('disabled');
       }
     }, { passive: false, capture: true });
     
