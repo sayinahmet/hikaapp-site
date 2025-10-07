@@ -140,11 +140,12 @@
     .doc-wrapper {
       width: 100%;
       height: 100%;
-      transform-origin: 0 0;
+      transform-origin: center center;
       transition: transform 0.1s ease-out;
       position: absolute;
-      top: 0;
-      left: 0;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
     
     .doc-frame {
@@ -274,17 +275,12 @@
       const wrapperWidth = viewportWidth / scale;
       const wrapperHeight = viewportHeight / scale;
       
-      // Set wrapper size and scale
+      // Set wrapper size
       wrapper.style.width = wrapperWidth + 'px';
       wrapper.style.height = wrapperHeight + 'px';
-      wrapper.style.transform = `scale(${scale})`;
       
-      // This creates scroll area because:
-      // - wrapper actual size = viewport / scale
-      // - wrapper visual size after scale = (viewport / scale) * scale = viewport
-      // - but wrapper takes space = viewport / scale
-      // - when scale < 1: wrapper bigger than viewport → scrollable
-      // - when scale > 1: wrapper smaller but scaled up → scrollable
+      // Apply both translate (for centering) and scale
+      wrapper.style.transform = `translate(-50%, -50%) scale(${scale})`;
       
       zoomLevelDisplay.textContent = Math.round(scale * 100) + '%';
     }
@@ -338,13 +334,13 @@
       }
     }, { passive: false });
     
-    // Re-enable overlay after scroll
+    // Re-enable overlay after scroll (short delay for smooth scrolling)
     document.addEventListener('touchend', function(e) {
       if (e.touches.length === 0 && scrollMode) {
         setTimeout(function() {
           overlay.style.pointerEvents = 'auto';
           scrollMode = false;
-        }, 300);
+        }, 50);
       }
     }, { passive: true });
     
