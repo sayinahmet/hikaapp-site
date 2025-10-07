@@ -156,15 +156,21 @@
     }
     
     .touch-overlay {
-      position: absolute;
-      top: 0;
+      position: fixed;
+      top: 60px;
       left: 0;
       right: 0;
       bottom: 0;
-      z-index: 10;
+      z-index: 999;
       pointer-events: auto;
       background: transparent;
       touch-action: none;
+    }
+    
+    @media (max-width: 768px) {
+      .touch-overlay {
+        top: 56px;
+      }
     }
     
     /* Loading */
@@ -234,8 +240,8 @@
 
   <div class="doc-container" id="container">
     <div class="loading">Rapor yükleniyor</div>
+    <div class="touch-overlay" id="overlay"></div>
     <div class="doc-wrapper" id="wrapper">
-      <div class="touch-overlay" id="overlay"></div>
       <iframe 
         class="doc-frame"
         id="iframe"
