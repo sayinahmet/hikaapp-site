@@ -288,23 +288,23 @@
       updateZoom();
     }
     
-    // Pinch to zoom - overlay always active but smart
+    // Pinch to zoom system
     let touching = false;
-    let overlayDisabled = false;
+    let scrolling = false;
     
     overlay.addEventListener('touchstart', function(e) {
       if (e.touches.length === 2) {
-        // Two fingers - zoom mode
+        // Two fingers - enable zoom
         e.preventDefault();
         e.stopPropagation();
         touching = true;
-        overlayDisabled = false;
+        scrolling = false;
         overlay.style.pointerEvents = 'auto';
         initialDistance = getDistance(e.touches[0], e.touches[1]);
         lastScale = scale;
       } else if (e.touches.length === 1) {
-        // One finger - disable overlay to allow container scroll
-        overlayDisabled = true;
+        // One finger - disable overlay for scroll
+        scrolling = true;
         overlay.style.pointerEvents = 'none';
       }
     }, { passive: false });
@@ -326,13 +326,13 @@
       }
     }, { passive: false });
     
-    // Re-enable overlay after touch ends
+    // Re-enable overlay after scroll ends
     document.addEventListener('touchend', function(e) {
-      if (e.touches.length === 0 && overlayDisabled) {
+      if (e.touches.length === 0 && scrolling) {
         setTimeout(function() {
           overlay.style.pointerEvents = 'auto';
-          overlayDisabled = false;
-        }, 100);
+          scrolling = false;
+        }, 200);
       }
     }, { passive: true });
     
