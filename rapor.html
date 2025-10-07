@@ -162,10 +162,11 @@
       z-index: 10;
       pointer-events: none;
       background: transparent;
+      touch-action: none;
     }
     
-    .touch-overlay.pinching {
-      cursor: zoom-in;
+    .touch-overlay.active {
+      pointer-events: auto;
     }
     
     /* Loading */
@@ -277,19 +278,37 @@
       updateZoom();
     }
     
-    // Pinch to zoom - document level to bypass iframe
+    // Pinch to zoom
     let touching = false;
+    let zoomMode = false;
     
-    function handleTouchStart(e) {
+    // Detect 2-finger touch globally (before it reaches iframe)
+    document.body.addEventListener('touchstart', function(e) {
       if (e.touches.length === 2) {
-        e.preventDefault();
+        // Enable overlay immediately to intercept touches
+        zoomMode = true;
         touching = true;
+        overlay.classList.add('active');
         initialDistance = getDistance(e.touches[0], e.touches[1]);
         lastScale = scale;
+        e.preventDefault();
       }
-    }
+    }, { passive: false, capture: true });
     
-    function handleTouchMove(e) {
+    // Also listen on container
+    container.addEventListener('touchstart', function(e) {
+      if (e.touches.length === 2) {
+        zoomMode = true;
+        touching = true;
+        overlay.classList.add('active');
+        initialDistance = getDistance(e.touches[0], e.touches[1]);
+        lastScale = scale;
+        e.preventDefault();
+      }
+    }, { passive: false, capture: true });
+    
+    // Handle zoom gesture globally
+    document.body.addEventListener('touchmove', function(e) {
       if (e.touches.length === 2 && touching) {
         e.preventDefault();
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
@@ -297,18 +316,15 @@
         scale = Math.min(Math.max(0.1, newScale), 5);
         updateZoom();
       }
-    }
+    }, { passive: false, capture: true });
     
-    function handleTouchEnd(e) {
-      if (e.touches.length < 2) {
+    document.body.addEventListener('touchend', function(e) {
+      if (e.touches.length < 2 && zoomMode) {
         touching = false;
+        zoomMode = false;
+        overlay.classList.remove('active');
       }
-    }
-    
-    // Listen on document to catch ALL touches (even on iframe)
-    document.addEventListener('touchstart', handleTouchStart, { passive: false });
-    document.addEventListener('touchmove', handleTouchMove, { passive: false });
-    document.addEventListener('touchend', handleTouchEnd, { passive: false });
+    }, { passive: false, capture: true });
     
     function getDistance(touch1, touch2) {
       const dx = touch1.clientX - touch2.clientX;
