@@ -73,6 +73,15 @@
       right: 0;
       bottom: 0;
       background: #fff;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    .doc-wrapper {
+      width: 100%;
+      height: 100%;
+      transform-origin: 0 0;
+      transition: transform 0.1s ease-out;
     }
     
     .doc-frame {
@@ -80,6 +89,7 @@
       height: 100%;
       border: none;
       display: block;
+      pointer-events: auto;
     }
     
     /* Loading */
@@ -141,16 +151,57 @@
     <a href="./index.html" class="back-btn">← Ana Sayfa</a>
   </div>
   
-  <div class="doc-container">
+  <div class="doc-container" id="container">
     <div class="loading">Rapor yükleniyor</div>
-    <iframe 
-      class="doc-frame"
-      src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTcqImwmoqI14CTwD5adZzRUworW9fMkwFoeSRykMvsdE4YWlo0uhm_mCtadhktzESwoOJKe2MmcrnP/pubhtml?gid=1490004875&single=true&rm=minimal&widget=false"
-      allow="fullscreen"
-      loading="eager"
-      onload="document.querySelector('.loading').style.display='none'"
-    ></iframe>
+    <div class="doc-wrapper" id="wrapper">
+      <iframe 
+        class="doc-frame"
+        src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTcqImwmoqI14CTwD5adZzRUworW9fMkwFoeSRykMvsdE4YWlo0uhm_mCtadhktzESwoOJKe2MmcrnP/pubhtml?gid=1490004875&single=true&rm=minimal&widget=false"
+        allow="fullscreen"
+        loading="eager"
+        onload="document.querySelector('.loading').style.display='none'"
+      ></iframe>
+    </div>
   </div>
+
+  <script>
+    // Pinch to zoom implementation
+    let scale = 1;
+    let lastScale = 1;
+    let initialDistance = 0;
+    
+    const wrapper = document.getElementById('wrapper');
+    const container = document.getElementById('container');
+    
+    container.addEventListener('touchstart', function(e) {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        initialDistance = getDistance(e.touches[0], e.touches[1]);
+        lastScale = scale;
+      }
+    }, { passive: false });
+    
+    container.addEventListener('touchmove', function(e) {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const currentDistance = getDistance(e.touches[0], e.touches[1]);
+        scale = lastScale * (currentDistance / initialDistance);
+        
+        // Min 0.25x, Max 5x
+        scale = Math.min(Math.max(0.25, scale), 5);
+        
+        wrapper.style.transform = `scale(${scale})`;
+        wrapper.style.width = `${100 / scale}%`;
+        wrapper.style.height = `${100 / scale}%`;
+      }
+    }, { passive: false });
+    
+    function getDistance(touch1, touch2) {
+      const dx = touch1.clientX - touch2.clientX;
+      const dy = touch1.clientY - touch2.clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+  </script>
 </body>
 </html>
 
