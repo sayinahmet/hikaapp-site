@@ -70,7 +70,15 @@
       margin: 8px 0;
       border-left: 3px solid rgba(255,255,255,.3);
     }
-    @media (max-width:980px){ .grid{grid-template-columns:1fr} .hero h1{font-size:30px} }
+    @media (max-width:980px){ 
+      .grid{grid-template-columns:1fr} 
+      .hero h1{font-size:30px} 
+      .nav{flex-direction:column; height:auto; padding:12px 0}
+      .brand{margin-bottom:8px}
+      .chips{display:flex; flex-wrap:wrap; gap:8px}
+      .chips a{margin-left:0}
+      .wrap{padding:0 16px}
+    }
   </style>
 </head>
 <body>
