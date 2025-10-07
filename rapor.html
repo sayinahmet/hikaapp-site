@@ -142,6 +142,7 @@
       height: 100%;
       transform-origin: 0 0;
       transition: transform 0.1s ease-out;
+      position: relative;
     }
     
     .doc-frame {
@@ -150,6 +151,21 @@
       border: none;
       display: block;
       pointer-events: auto;
+    }
+    
+    .touch-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10;
+      pointer-events: none;
+      background: transparent;
+    }
+    
+    .touch-overlay.pinching {
+      cursor: zoom-in;
     }
     
     /* Loading */
@@ -220,8 +236,10 @@
   <div class="doc-container" id="container">
     <div class="loading">Rapor yükleniyor</div>
     <div class="doc-wrapper" id="wrapper">
+      <div class="touch-overlay" id="overlay"></div>
       <iframe 
         class="doc-frame"
+        id="iframe"
         src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTcqImwmoqI14CTwD5adZzRUworW9fMkwFoeSRykMvsdE4YWlo0uhm_mCtadhktzESwoOJKe2MmcrnP/pubhtml?gid=1490004875&single=true&rm=minimal&widget=false"
         allow="fullscreen"
         loading="eager"
@@ -237,6 +255,8 @@
     
     const wrapper = document.getElementById('wrapper');
     const container = document.getElementById('container');
+    const overlay = document.getElementById('overlay');
+    const iframe = document.getElementById('iframe');
     const zoomLevelDisplay = document.getElementById('zoomLevel');
     
     function updateZoom() {
@@ -260,30 +280,49 @@
     // Pinch to zoom
     let touching = false;
     
-    container.addEventListener('touchstart', function(e) {
+    function handleTouchStart(e) {
       if (e.touches.length === 2) {
-        touching = true;
         e.preventDefault();
+        e.stopPropagation();
+        touching = true;
+        overlay.classList.add('pinching');
+        overlay.style.pointerEvents = 'auto';
+        iframe.style.pointerEvents = 'none';
         initialDistance = getDistance(e.touches[0], e.touches[1]);
         lastScale = scale;
+      } else if (e.touches.length === 1) {
+        // Single touch - allow iframe interaction
+        overlay.style.pointerEvents = 'none';
+        iframe.style.pointerEvents = 'auto';
       }
-    }, { passive: false });
+    }
     
-    container.addEventListener('touchmove', function(e) {
+    function handleTouchMove(e) {
       if (e.touches.length === 2 && touching) {
         e.preventDefault();
+        e.stopPropagation();
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
         scale = lastScale * (currentDistance / initialDistance);
         scale = Math.min(Math.max(0.1, scale), 5);
         updateZoom();
       }
-    }, { passive: false });
+    }
     
-    container.addEventListener('touchend', function(e) {
+    function handleTouchEnd(e) {
       if (e.touches.length < 2) {
         touching = false;
+        overlay.classList.remove('pinching');
+        setTimeout(() => {
+          overlay.style.pointerEvents = 'none';
+          iframe.style.pointerEvents = 'auto';
+        }, 150);
       }
-    });
+    }
+    
+    // Listen on container (always captures touch events)
+    container.addEventListener('touchstart', handleTouchStart, { passive: false, capture: true });
+    container.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true });
+    container.addEventListener('touchend', handleTouchEnd, { passive: false, capture: true });
     
     function getDistance(touch1, touch2) {
       const dx = touch1.clientX - touch2.clientX;
