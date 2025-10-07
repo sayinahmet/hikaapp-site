@@ -65,6 +65,56 @@
       background: rgba(255,255,255,.15);
     }
     
+    /* Zoom Controls */
+    .zoom-controls {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1001;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .zoom-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(20,24,32,.95), rgba(20,24,32,.92));
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,.2);
+      color: #fff;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,.3);
+      transition: all 0.2s;
+      user-select: none;
+    }
+    
+    .zoom-btn:active {
+      transform: scale(0.95);
+      background: rgba(20,24,32,1);
+    }
+    
+    .zoom-level {
+      width: 50px;
+      height: 30px;
+      border-radius: 15px;
+      background: linear-gradient(180deg, rgba(20,24,32,.95), rgba(20,24,32,.92));
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,.2);
+      color: #fff;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,.3);
+    }
+    
     /* Document Container */
     .doc-container {
       position: fixed;
@@ -151,6 +201,12 @@
     <a href="./index.html" class="back-btn">← Ana Sayfa</a>
   </div>
   
+  <div class="zoom-controls">
+    <div class="zoom-btn" onclick="zoomIn()">+</div>
+    <div class="zoom-level" id="zoomLevel">100%</div>
+    <div class="zoom-btn" onclick="zoomOut()">−</div>
+  </div>
+
   <div class="doc-container" id="container">
     <div class="loading">Rapor yükleniyor</div>
     <div class="doc-wrapper" id="wrapper">
@@ -165,16 +221,38 @@
   </div>
 
   <script>
-    // Pinch to zoom implementation
     let scale = 1;
     let lastScale = 1;
     let initialDistance = 0;
     
     const wrapper = document.getElementById('wrapper');
     const container = document.getElementById('container');
+    const zoomLevelDisplay = document.getElementById('zoomLevel');
+    
+    function updateZoom() {
+      wrapper.style.transform = `scale(${scale})`;
+      wrapper.style.width = `${100 / scale}%`;
+      wrapper.style.height = `${100 / scale}%`;
+      zoomLevelDisplay.textContent = Math.round(scale * 100) + '%';
+    }
+    
+    // Button zoom controls
+    function zoomIn() {
+      scale = Math.min(scale + 0.25, 5);
+      updateZoom();
+    }
+    
+    function zoomOut() {
+      scale = Math.max(scale - 0.25, 0.25);
+      updateZoom();
+    }
+    
+    // Pinch to zoom
+    let touching = false;
     
     container.addEventListener('touchstart', function(e) {
       if (e.touches.length === 2) {
+        touching = true;
         e.preventDefault();
         initialDistance = getDistance(e.touches[0], e.touches[1]);
         lastScale = scale;
@@ -182,25 +260,36 @@
     }, { passive: false });
     
     container.addEventListener('touchmove', function(e) {
-      if (e.touches.length === 2) {
+      if (e.touches.length === 2 && touching) {
         e.preventDefault();
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
         scale = lastScale * (currentDistance / initialDistance);
-        
-        // Min 0.25x, Max 5x
         scale = Math.min(Math.max(0.25, scale), 5);
-        
-        wrapper.style.transform = `scale(${scale})`;
-        wrapper.style.width = `${100 / scale}%`;
-        wrapper.style.height = `${100 / scale}%`;
+        updateZoom();
       }
     }, { passive: false });
+    
+    container.addEventListener('touchend', function(e) {
+      if (e.touches.length < 2) {
+        touching = false;
+      }
+    });
     
     function getDistance(touch1, touch2) {
       const dx = touch1.clientX - touch2.clientX;
       const dy = touch1.clientY - touch2.clientY;
       return Math.sqrt(dx * dx + dy * dy);
     }
+    
+    // Prevent default zoom on double tap
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(e) {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
   </script>
 </body>
 </html>
