@@ -1,137 +1,390 @@
 <!doctype html>
 <html lang="tr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=0.1, maximum-scale=5.0" />
-<title>Raporlar – Hi‑Ka Araç Yönetimi</title>
-<link rel="icon" href="./assets/logo-120.png" type="image/png">
-<style>
-* { margin:0; padding:0; box-sizing:border-box; }
-html, body { height:100%; width:100%; overflow:hidden; }
-body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:#1a1f28; }
-
-/* Header */
-.header { background: linear-gradient(180deg, rgba(20,24,32,.95), rgba(20,24,32,.92)); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,.1); padding:12px 20px; display:flex; align-items:center; justify-content:space-between; position:fixed; top:0; left:0; right:0; z-index:1000; height:60px; }
-.brand { display:flex; align-items:center; color:#fff; font-weight:700; font-size:16px; }
-.brand img { width:28px; height:28px; margin-right:10px; border-radius:6px; }
-.back-btn { display:inline-block; padding:8px 14px; border-radius:8px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); color:#fff; text-decoration:none; font-size:14px; transition:all 0.2s; }
-.back-btn:hover { background: rgba(255,255,255,.15); }
-
-/* Zoom Controls */
-.zoom-controls { position:fixed; bottom:20px; right:20px; z-index:1001; display:flex; flex-direction:column; gap:10px; }
-.zoom-btn { width:50px; height:50px; border-radius:50%; background:linear-gradient(180deg, rgba(20,24,32,.95), rgba(20,24,32,.92)); backdrop-filter: blur(10px); border:1px solid rgba(255,255,255,.2); color:#fff; font-size:24px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,.3); transition:all 0.2s; user-select:none; line-height:1; padding:0; }
-.zoom-btn:active { transform:scale(0.95); background: rgba(20,24,32,1); }
-.zoom-level { width:50px; height:30px; border-radius:15px; background:linear-gradient(180deg, rgba(20,24,32,.95), rgba(20,24,32,.92)); backdrop-filter: blur(10px); border:1px solid rgba(255,255,255,.2); color:#fff; font-size:12px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,.3); }
-
-/* Document Container */
-.doc-container { position:fixed; top:60px; left:0; right:0; bottom:0; background:#fff; overflow:auto; -webkit-overflow-scrolling:touch; }
-.doc-wrapper { width:100%; height:100%; transform-origin:0 0; transition:transform 0.1s ease-out; display:flex; flex-direction:column; }
-.doc-frame { width:100%; height:100%; border:none; display:block; pointer-events:auto; }
-
-/* Loading */
-.loading { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#666; font-size:16px; text-align:center; }
-.loading::after { content:'...'; animation:dots 1.5s infinite; }
-@keyframes dots { 0%,20% { content:'.'; } 40% { content:'..'; } 60%,100% { content:'...'; } }
-
-@media (max-width:768px) {
-  .header { padding:10px 16px; height:56px; }
-  .brand { font-size:14px; }
-  .brand img { width:24px; height:24px; margin-right:8px; }
-  .back-btn { padding:6px 10px; font-size:13px; }
-  .doc-container { top:56px; }
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=0.1, maximum-scale=5.0" />
+  <title>Raporlar – Hi‑Ka Araç Yönetimi</title>
+  <link rel="icon" href="./assets/logo-120.png" type="image/png">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      height: 100%; 
+      width: 100%;
+      overflow: hidden;
+    }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: #1a1f28;
+    }
+    
+    /* Header */
+    .header {
+      background: linear-gradient(180deg, rgba(20,24,32,.95), rgba(20,24,32,.92));
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: 60px;
+    }
+    
+    .brand {
+      display: flex;
+      align-items: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    
+    .brand img {
+      width: 28px;
+      height: 28px;
+      margin-right: 10px;
+      border-radius: 6px;
+    }
+    
+    .back-btn {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.2);
+      color: #fff;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    
+    .back-btn:hover {
+      background: rgba(255,255,255,.15);
+    }
+    
+    /* Zoom Controls */
+    .zoom-controls {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1001;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .zoom-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(20,24,32,.95), rgba(20,24,32,.92));
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,.2);
+      color: #fff;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,.3);
+      transition: all 0.2s;
+      user-select: none;
+      line-height: 1;
+      padding: 0;
+    }
+    
+    /* Desktop için daha iyi hizalama */
+    @media (min-width: 769px) {
+      .zoom-btn {
+        line-height: 1;
+        padding-bottom: 4px;
+      }
+    }
+    
+    .zoom-btn:active {
+      transform: scale(0.95);
+      background: rgba(20,24,32,1);
+    }
+    
+    .zoom-level {
+      width: 50px;
+      height: 30px;
+      border-radius: 15px;
+      background: linear-gradient(180deg, rgba(20,24,32,.95), rgba(20,24,32,.92));
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,.2);
+      color: #fff;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,.3);
+    }
+    
+    /* Document Container */
+    .doc-container {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #fff;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    .doc-wrapper {
+      width: 100%;
+      height: 100%;
+      min-width: 100%;
+      min-height: 100%;
+      transform-origin: center center;
+      transition: transform 0.1s ease-out;
+      position: relative;
+    }
+    
+    .doc-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      pointer-events: auto;
+    }
+    
+    .touch-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10;
+      pointer-events: auto;
+      background: transparent;
+      touch-action: none;
+    }
+    
+    /* Loading */
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #666;
+      font-size: 16px;
+      text-align: center;
+    }
+    
+    .loading::after {
+      content: '...';
+      animation: dots 1.5s infinite;
+    }
+    
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+    
+    /* Mobile */
+    @media (max-width: 768px) {
+      .header {
+        padding: 10px 16px;
+        height: 56px;
+      }
+      
+      .brand {
+        font-size: 14px;
+      }
+      
+      .brand img {
+        width: 24px;
+        height: 24px;
+        margin-right: 8px;
+      }
+      
+      .back-btn {
+        padding: 6px 10px;
+        font-size: 13px;
+      }
+      
+      .doc-container {
+        top: 56px;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="header">
-  <div class="brand">
-    <img src="./assets/logo-120.png" alt="HİKA Logo">
-    <span>Raporlar</span>
+  <div class="header">
+    <div class="brand">
+      <img src="./assets/logo-120.png" alt="HİKA Logo">
+      <span>Raporlar</span>
+    </div>
+    <a href="./index.html" class="back-btn">← Ana Sayfa</a>
   </div>
-  <a href="./index.html" class="back-btn">← Ana Sayfa</a>
-</div>
-
-<div class="zoom-controls">
-  <div class="zoom-btn" onclick="zoomIn()">+</div>
-  <div class="zoom-level" id="zoomLevel">100%</div>
-  <div class="zoom-btn" onclick="zoomOut()">−</div>
-</div>
-
-<div class="doc-container" id="container">
-  <div class="loading">Rapor yükleniyor</div>
-  <div class="doc-wrapper" id="wrapper">
-    <iframe
-      class="doc-frame"
-      id="iframe"
-      src="https://api.allorigins.win/raw?url=https%3A%2F%2Fdocs.google.com%2Fspreadsheets%2Fe%2F2PACX-1vTcqImwmoqI14CTwD5adZzRUworW9fMkwFoeSRykMvsdE4YWlo0uhm_mCtadhktzESwoOJKe2MmcrnP%2Fpubhtml%3Fgid%3D1490004875%26single%3Dtrue%26rm%3Dminimal%26widget%3Dfalse"
-      allowfullscreen
-      loading="eager"
-      onload="document.querySelector('.loading').style.display='none';">
-    </iframe>
+  
+  <div class="zoom-controls">
+    <div class="zoom-btn" onclick="zoomIn()">+</div>
+    <div class="zoom-level" id="zoomLevel">100%</div>
+    <div class="zoom-btn" onclick="zoomOut()">−</div>
   </div>
-</div>
 
-<script>
-let scale = 1;
-let lastScale = 1;
-let initialDistance = 0;
-const wrapper = document.getElementById('wrapper');
-const container = document.getElementById('container');
-const zoomLevelDisplay = document.getElementById('zoomLevel');
+  <div class="doc-container" id="container">
+    <div class="loading">Rapor yükleniyor</div>
+    <div class="doc-wrapper" id="wrapper">
+      <div class="touch-overlay" id="overlay"></div>
+      <iframe 
+        class="doc-frame"
+        id="iframe"
+        src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTcqImwmoqI14CTwD5adZzRUworW9fMkwFoeSRykMvsdE4YWlo0uhm_mCtadhktzESwoOJKe2MmcrnP/pubhtml?gid=1490004875&single=true&rm=minimal&widget=false"
+        allow="fullscreen"
+        loading="eager"
+        onload="document.querySelector('.loading').style.display='none'"
+      ></iframe>
+    </div>
+  </div>
 
-function updateZoom() {
-  wrapper.style.transform = `scale(${scale})`;
-  wrapper.style.width = `${100/scale}%`;
-  wrapper.style.height = `${100/scale}%`;
-  zoomLevelDisplay.textContent = Math.round(scale*100) + '%';
-}
-
-function zoomIn() { scale = Math.min(scale+0.1,5); updateZoom(); }
-function zoomOut() { scale = Math.max(scale-0.1,0.1); updateZoom(); }
-
-// Pinch & Pan for mobile
-let touching = false;
-let startX=0, startY=0, offsetX=0, offsetY=0;
-
-container.addEventListener('touchstart', e=>{
-  if(e.touches.length===2){
-    touching=true;
-    e.preventDefault();
-    initialDistance = getDistance(e.touches[0], e.touches[1]);
-    lastScale = scale;
-  } else if(e.touches.length===1){
-    startX=e.touches[0].clientX - offsetX;
-    startY=e.touches[0].clientY - offsetY;
-  }
-},{passive:false});
-
-container.addEventListener('touchmove', e=>{
-  if(e.touches.length===2 && touching){
-    e.preventDefault();
-    const dist = getDistance(e.touches[0], e.touches[1]);
-    scale = Math.min(Math.max(0.1,lastScale*(dist/initialDistance)),5);
-    updateZoom();
-  } else if(e.touches.length===1 && !touching){
-    e.preventDefault();
-    offsetX = e.touches[0].clientX - startX;
-    offsetY = e.touches[0].clientY - startY;
-    wrapper.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
-  }
-},{passive:false});
-
-container.addEventListener('touchend', e=>{
-  if(e.touches.length<2) touching=false;
-});
-
-function getDistance(t1,t2){ const dx=t1.clientX-t2.clientX; const dy=t1.clientY-t2.clientY; return Math.sqrt(dx*dx+dy*dy); }
-
-// Prevent double-tap zoom
-let lastTouchEnd=0;
-document.addEventListener('touchend', e=>{
-  const now=Date.now();
-  if(now-lastTouchEnd<=300) e.preventDefault();
-  lastTouchEnd=now;
-},false);
-</script>
+  <script>
+    let scale = 1;
+    let lastScale = 1;
+    let initialDistance = 0;
+    
+    const wrapper = document.getElementById('wrapper');
+    const container = document.getElementById('container');
+    const overlay = document.getElementById('overlay');
+    const iframe = document.getElementById('iframe');
+    const zoomLevelDisplay = document.getElementById('zoomLevel');
+    
+    function updateZoom() {
+      // Save current scroll position and center point
+      const scrollX = container.scrollLeft;
+      const scrollY = container.scrollTop;
+      const centerX = scrollX + container.clientWidth / 2;
+      const centerY = scrollY + container.clientHeight / 2;
+      
+      // Apply scale transform
+      wrapper.style.transform = `scale(${scale})`;
+      
+      // Adjust wrapper dimensions inversely to maintain content size
+      wrapper.style.width = `${100 / scale}%`;
+      wrapper.style.height = `${100 / scale}%`;
+      
+      // Calculate scroll area based on scale
+      const containerWidth = container.clientWidth;
+      const containerHeight = container.clientHeight;
+      
+      // Set minimum dimensions to enable scrolling
+      if (scale !== 1) {
+        const scaledWidth = containerWidth * scale;
+        const scaledHeight = containerHeight * scale;
+        wrapper.style.minWidth = scaledWidth + 'px';
+        wrapper.style.minHeight = scaledHeight + 'px';
+        
+        // Adjust scroll to maintain center point
+        setTimeout(() => {
+          container.scrollLeft = centerX * scale - container.clientWidth / 2;
+          container.scrollTop = centerY * scale - container.clientHeight / 2;
+        }, 0);
+      } else {
+        wrapper.style.minWidth = '100%';
+        wrapper.style.minHeight = '100%';
+      }
+      
+      zoomLevelDisplay.textContent = Math.round(scale * 100) + '%';
+    }
+    
+    // Button zoom controls
+    function zoomIn() {
+      scale = Math.min(scale + 0.25, 5);
+      updateZoom();
+    }
+    
+    function zoomOut() {
+      scale = Math.max(scale - 0.25, 0.1);
+      updateZoom();
+    }
+    
+    // Pinch to zoom - overlay always active
+    let touching = false;
+    let lastTouchCount = 0;
+    
+    overlay.addEventListener('touchstart', function(e) {
+      lastTouchCount = e.touches.length;
+      
+      if (e.touches.length === 2) {
+        // Two fingers - zoom mode
+        e.preventDefault();
+        e.stopPropagation();
+        touching = true;
+        initialDistance = getDistance(e.touches[0], e.touches[1]);
+        lastScale = scale;
+      } else if (e.touches.length === 1) {
+        // One finger - pass through to iframe by temporarily hiding overlay
+        overlay.style.pointerEvents = 'none';
+        
+        // Forward the touch to iframe
+        setTimeout(() => {
+          overlay.style.pointerEvents = 'auto';
+        }, 10);
+      }
+    }, { passive: false });
+    
+    overlay.addEventListener('touchmove', function(e) {
+      if (e.touches.length === 2) {
+        if (!touching) {
+          // Second finger added during move
+          touching = true;
+          initialDistance = getDistance(e.touches[0], e.touches[1]);
+          lastScale = scale;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        const currentDistance = getDistance(e.touches[0], e.touches[1]);
+        const newScale = lastScale * (currentDistance / initialDistance);
+        scale = Math.min(Math.max(0.1, newScale), 5);
+        updateZoom();
+      }
+    }, { passive: false });
+    
+    overlay.addEventListener('touchend', function(e) {
+      if (e.touches.length < 2) {
+        touching = false;
+        lastTouchCount = e.touches.length;
+      }
+    }, { passive: false });
+    
+    // Prevent default pinch zoom on document
+    document.addEventListener('gesturestart', function(e) {
+      e.preventDefault();
+    });
+    
+    document.addEventListener('gesturechange', function(e) {
+      e.preventDefault();
+    });
+    
+    document.addEventListener('gestureend', function(e) {
+      e.preventDefault();
+    });
+    
+    function getDistance(touch1, touch2) {
+      const dx = touch1.clientX - touch2.clientX;
+      const dy = touch1.clientY - touch2.clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+    
+    // Prevent default zoom on double tap
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(e) {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+  </script>
 </body>
 </html>
+
