@@ -159,9 +159,13 @@
       right: 0;
       bottom: 0;
       z-index: 1000;
-      pointer-events: auto;
+      pointer-events: none;
       background: transparent;
       touch-action: none;
+    }
+    
+    .touch-overlay.active {
+      pointer-events: auto;
     }
     
     @media (max-width: 768px) {
@@ -284,27 +288,25 @@
       updateZoom();
     }
     
-    // Pinch zoom system
+    // Pinch zoom - detect 2 fingers globally, activate overlay
     let touching = false;
     
-    overlay.addEventListener('touchstart', function(e) {
+    // Detect 2-finger touch at document level (before it reaches iframe)
+    document.addEventListener('touchstart', function(e) {
       if (e.touches.length === 2) {
-        // Two fingers detected - zoom mode
-        e.preventDefault();
-        e.stopPropagation();
+        // Activate overlay immediately
         touching = true;
+        overlay.classList.add('active');
         initialDistance = getDistance(e.touches[0], e.touches[1]);
         lastScale = scale;
+        e.preventDefault();
       } else if (e.touches.length === 1) {
-        // One finger - disable overlay for container scroll
-        overlay.style.pointerEvents = 'none';
-        // Re-enable after a short delay to allow scroll to start
-        setTimeout(() => {
-          overlay.style.pointerEvents = 'auto';
-        }, 100);
+        // Keep overlay inactive for 1-finger scroll
+        overlay.classList.remove('active');
       }
-    }, { passive: false });
+    }, { passive: false, capture: true });
     
+    // Handle zoom on overlay when active
     overlay.addEventListener('touchmove', function(e) {
       if (e.touches.length === 2 && touching) {
         e.preventDefault();
@@ -316,11 +318,13 @@
       }
     }, { passive: false });
     
-    overlay.addEventListener('touchend', function(e) {
+    // Deactivate overlay when touch ends
+    document.addEventListener('touchend', function(e) {
       if (e.touches.length < 2) {
         touching = false;
+        overlay.classList.remove('active');
       }
-    }, { passive: false });
+    }, { passive: false, capture: true });
     
     // Prevent default pinch zoom on document
     document.addEventListener('gesturestart', function(e) {
