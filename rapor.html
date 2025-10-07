@@ -133,7 +133,7 @@
       right: 0;
       bottom: 0;
       background: #fff;
-      overflow: auto;
+      overflow: scroll;
       -webkit-overflow-scrolling: touch;
     }
     
@@ -142,7 +142,9 @@
       height: 100%;
       transform-origin: 0 0;
       transition: transform 0.1s ease-out;
-      position: relative;
+      position: absolute;
+      top: 0;
+      left: 0;
     }
     
     .doc-frame {
@@ -159,7 +161,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      z-index: 998;
+      z-index: 1000;
       pointer-events: auto;
       background: transparent;
       touch-action: none;
@@ -264,15 +266,25 @@
     const zoomLevelDisplay = document.getElementById('zoomLevel');
     
     function updateZoom() {
-      wrapper.style.transform = `scale(${scale})`;
-      wrapper.style.width = `${100 / scale}%`;
-      wrapper.style.height = `${100 / scale}%`;
-      
-      // Enable scrolling by setting minimum dimensions
+      // Get container dimensions
       const viewportWidth = container.clientWidth;
       const viewportHeight = container.clientHeight;
-      wrapper.style.minWidth = (viewportWidth / scale) + 'px';
-      wrapper.style.minHeight = (viewportHeight / scale) + 'px';
+      
+      // Calculate wrapper size (inversely proportional to scale)
+      const wrapperWidth = viewportWidth / scale;
+      const wrapperHeight = viewportHeight / scale;
+      
+      // Set wrapper size and scale
+      wrapper.style.width = wrapperWidth + 'px';
+      wrapper.style.height = wrapperHeight + 'px';
+      wrapper.style.transform = `scale(${scale})`;
+      
+      // This creates scroll area because:
+      // - wrapper actual size = viewport / scale
+      // - wrapper visual size after scale = (viewport / scale) * scale = viewport
+      // - but wrapper takes space = viewport / scale
+      // - when scale < 1: wrapper bigger than viewport → scrollable
+      // - when scale > 1: wrapper smaller but scaled up → scrollable
       
       zoomLevelDisplay.textContent = Math.round(scale * 100) + '%';
     }
@@ -288,23 +300,23 @@
       updateZoom();
     }
     
-    // Pinch to zoom system
+    // Pinch to zoom with scroll support
     let touching = false;
-    let scrolling = false;
+    let scrollMode = false;
     
     overlay.addEventListener('touchstart', function(e) {
       if (e.touches.length === 2) {
-        // Two fingers - enable zoom
+        // Two fingers - zoom mode
         e.preventDefault();
         e.stopPropagation();
         touching = true;
-        scrolling = false;
+        scrollMode = false;
         overlay.style.pointerEvents = 'auto';
         initialDistance = getDistance(e.touches[0], e.touches[1]);
         lastScale = scale;
       } else if (e.touches.length === 1) {
         // One finger - disable overlay for scroll
-        scrolling = true;
+        scrollMode = true;
         overlay.style.pointerEvents = 'none';
       }
     }, { passive: false });
@@ -326,13 +338,13 @@
       }
     }, { passive: false });
     
-    // Re-enable overlay after scroll ends
+    // Re-enable overlay after scroll
     document.addEventListener('touchend', function(e) {
-      if (e.touches.length === 0 && scrolling) {
+      if (e.touches.length === 0 && scrollMode) {
         setTimeout(function() {
           overlay.style.pointerEvents = 'auto';
-          scrolling = false;
-        }, 200);
+          scrollMode = false;
+        }, 300);
       }
     }, { passive: true });
     
