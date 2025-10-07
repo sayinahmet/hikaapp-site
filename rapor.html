@@ -140,10 +140,9 @@
     .doc-wrapper {
       width: 100%;
       height: 100%;
-      transform-origin: center center;
+      transform-origin: 0 0;
       transition: transform 0.1s ease-out;
       position: relative;
-      display: block;
     }
     
     .doc-frame {
@@ -155,21 +154,15 @@
     }
     
     .touch-overlay {
-      position: fixed;
-      top: 60px;
+      position: absolute;
+      top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      z-index: 999;
+      z-index: 10;
       pointer-events: auto;
       background: transparent;
       touch-action: none;
-    }
-    
-    @media (max-width: 768px) {
-      .touch-overlay {
-        top: 56px;
-      }
     }
     
     /* Loading */
@@ -237,11 +230,10 @@
     <div class="zoom-btn" onclick="zoomOut()">−</div>
   </div>
 
-  <div class="touch-overlay" id="overlay"></div>
-
   <div class="doc-container" id="container">
     <div class="loading">Rapor yükleniyor</div>
     <div class="doc-wrapper" id="wrapper">
+      <div class="touch-overlay" id="overlay"></div>
       <iframe 
         class="doc-frame"
         id="iframe"
@@ -265,71 +257,63 @@
     const zoomLevelDisplay = document.getElementById('zoomLevel');
     
     function updateZoom() {
-      // Apply scale transform
       wrapper.style.transform = `scale(${scale})`;
+      wrapper.style.width = `${100 / scale}%`;
+      wrapper.style.height = `${100 / scale}%`;
       
-      // For center origin, we need to adjust container overflow behavior
-      if (scale > 1) {
-        // Zoom in: create scroll area
-        const viewportWidth = container.clientWidth;
-        const viewportHeight = container.clientHeight;
-        
-        // Calculate total size needed
-        const totalWidth = viewportWidth / scale;
-        const totalHeight = viewportHeight / scale;
-        
-        wrapper.style.width = totalWidth + 'px';
-        wrapper.style.height = totalHeight + 'px';
-        
-        // Add margin to enable scrolling from center
-        const marginX = (viewportWidth * scale - viewportWidth) / 2;
-        const marginY = (viewportHeight * scale - viewportHeight) / 2;
-        
-        wrapper.style.margin = `${marginY}px ${marginX}px`;
-      } else {
-        // Zoom out or normal: reset
-        wrapper.style.width = '100%';
-        wrapper.style.height = '100%';
-        wrapper.style.margin = '0';
-      }
+      // Enable scrolling by setting minimum dimensions
+      const viewportWidth = container.clientWidth;
+      const viewportHeight = container.clientHeight;
+      wrapper.style.minWidth = (viewportWidth / scale) + 'px';
+      wrapper.style.minHeight = (viewportHeight / scale) + 'px';
       
       zoomLevelDisplay.textContent = Math.round(scale * 100) + '%';
     }
     
     // Button zoom controls
     function zoomIn() {
-      scale = Math.min(scale + 0.25, 5);
+      scale = Math.min(scale + 0.1, 5);
       updateZoom();
     }
     
     function zoomOut() {
-      scale = Math.max(scale - 0.25, 0.1);
+      scale = Math.max(scale - 0.1, 0.1);
       updateZoom();
     }
     
-    // Pinch to zoom - overlay always on, handle both cases
+    // Pinch to zoom - overlay always active
     let touching = false;
-    let overlayEnabled = true;
+    let lastTouchCount = 0;
     
     overlay.addEventListener('touchstart', function(e) {
+      lastTouchCount = e.touches.length;
+      
       if (e.touches.length === 2) {
-        // Two fingers - zoom
+        // Two fingers - zoom mode
         e.preventDefault();
         e.stopPropagation();
         touching = true;
-        overlayEnabled = true;
-        overlay.style.pointerEvents = 'auto';
         initialDistance = getDistance(e.touches[0], e.touches[1]);
         lastScale = scale;
       } else if (e.touches.length === 1) {
-        // One finger - disable overlay for scroll/pan
-        overlayEnabled = false;
+        // One finger - pass through to iframe by temporarily hiding overlay
         overlay.style.pointerEvents = 'none';
+        
+        // Forward the touch to iframe
+        setTimeout(() => {
+          overlay.style.pointerEvents = 'auto';
+        }, 10);
       }
     }, { passive: false });
     
     overlay.addEventListener('touchmove', function(e) {
-      if (e.touches.length === 2 && touching) {
+      if (e.touches.length === 2) {
+        if (!touching) {
+          // Second finger added during move
+          touching = true;
+          initialDistance = getDistance(e.touches[0], e.touches[1]);
+          lastScale = scale;
+        }
         e.preventDefault();
         e.stopPropagation();
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
@@ -342,18 +326,9 @@
     overlay.addEventListener('touchend', function(e) {
       if (e.touches.length < 2) {
         touching = false;
+        lastTouchCount = e.touches.length;
       }
     }, { passive: false });
-    
-    // Re-enable overlay after scroll/pan ends
-    document.addEventListener('touchend', function(e) {
-      if (e.touches.length === 0 && !overlayEnabled) {
-        setTimeout(function() {
-          overlay.style.pointerEvents = 'auto';
-          overlayEnabled = true;
-        }, 100);
-      }
-    }, { passive: true });
     
     // Prevent default pinch zoom on document
     document.addEventListener('gesturestart', function(e) {
