@@ -70,14 +70,56 @@
       margin: 8px 0;
       border-left: 3px solid rgba(255,255,255,.3);
     }
-    @media (max-width:980px){ 
+    /* Hamburger Menu */
+    .hamburger{
+      display:none;
+      flex-direction:column;
+      gap:4px;
+      cursor:pointer;
+      padding:8px;
+    }
+    .hamburger span{
+      width:24px;
+      height:2px;
+      background:#fff;
+      transition:all 0.3s;
+      border-radius:2px;
+    }
+    .hamburger.active span:nth-child(1){transform:rotate(45deg) translate(6px, 6px)}
+    .hamburger.active span:nth-child(2){opacity:0}
+    .hamburger.active span:nth-child(3){transform:rotate(-45deg) translate(5px, -5px)}
+    
+    @media (max-width:768px){ 
       .grid{grid-template-columns:1fr} 
       .hero h1{font-size:30px} 
-      .nav{flex-direction:column; height:auto; padding:12px 0}
-      .brand{margin-bottom:8px}
-      .chips{display:flex; flex-wrap:wrap; gap:8px}
-      .chips a{margin-left:0}
       .wrap{padding:0 16px}
+      
+      /* Mobile Menu */
+      .hamburger{display:flex}
+      .chips{
+        display:none;
+        position:fixed;
+        top:64px;
+        left:0;
+        right:0;
+        background:linear-gradient(180deg,rgba(20,24,32,.98),rgba(20,24,32,.95));
+        backdrop-filter:blur(20px);
+        flex-direction:column;
+        padding:16px 20px;
+        border-bottom:1px solid rgba(255,255,255,.1);
+        box-shadow:0 10px 30px rgba(0,0,0,.5);
+        z-index:999;
+      }
+      .chips.active{display:flex}
+      .chips a{
+        margin:0;
+        padding:12px 16px;
+        border-radius:8px;
+        text-align:center;
+        background:rgba(255,255,255,.05);
+        margin-bottom:8px;
+      }
+      .chips a:hover{background:rgba(255,255,255,.1)}
     }
   </style>
 </head>
@@ -88,9 +130,14 @@
     <div class="wrap nav">
       <div class="brand">
         <img src="./assets/logo-120.png" alt="HİKA App Logo">
-        Hi-Ka
+        HİKA App
       </div>
-      <div class="chips">
+      <div class="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="chips" id="menu">
         <a href="./rapor.html">Raporlar</a>
         <a href="./testing.html">Testing</a>
         <a href="./support.html">Destek</a>
@@ -99,6 +146,28 @@
       </div>
     </div>
   </header>
+
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById('menu');
+      const hamburger = document.querySelector('.hamburger');
+      menu.classList.toggle('active');
+      hamburger.classList.toggle('active');
+    }
+    
+    // Menü dışına tıklayınca kapat
+    document.addEventListener('click', function(event) {
+      const menu = document.getElementById('menu');
+      const hamburger = document.querySelector('.hamburger');
+      const isClickInsideMenu = menu.contains(event.target);
+      const isClickInsideHamburger = hamburger.contains(event.target);
+      
+      if (!isClickInsideMenu && !isClickInsideHamburger && menu.classList.contains('active')) {
+        menu.classList.remove('active');
+        hamburger.classList.remove('active');
+      }
+    });
+  </script>
 
   <main class="wrap">
     <section class="hero">
