@@ -140,11 +140,9 @@
     .doc-wrapper {
       width: 100%;
       height: 100%;
-      transform-origin: 0 0;
+      transform-origin: center center;
       transition: transform 0.1s ease-out;
       position: relative;
-      min-width: 100%;
-      min-height: 100%;
     }
     
     .doc-frame {
@@ -156,21 +154,15 @@
     }
     
     .touch-overlay {
-      position: fixed;
-      top: 60px;
+      position: absolute;
+      top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      z-index: 1000;
+      z-index: 10;
       pointer-events: auto;
       background: transparent;
       touch-action: none;
-    }
-    
-    @media (max-width: 768px) {
-      .touch-overlay {
-        top: 56px;
-      }
     }
     
     /* Loading */
@@ -238,11 +230,10 @@
     <div class="zoom-btn" onclick="zoomOut()">−</div>
   </div>
 
-  <div class="touch-overlay" id="overlay"></div>
-  
   <div class="doc-container" id="container">
     <div class="loading">Rapor yükleniyor</div>
     <div class="doc-wrapper" id="wrapper">
+      <div class="touch-overlay" id="overlay"></div>
       <iframe 
         class="doc-frame"
         id="iframe"
@@ -270,19 +261,15 @@
       wrapper.style.width = `${100 / scale}%`;
       wrapper.style.height = `${100 / scale}%`;
       
-      // Adjust container's scroll area by setting wrapper's transform-origin and padding
-      const viewportHeight = container.clientHeight;
-      const viewportWidth = container.clientWidth;
-      const scaledHeight = viewportHeight * scale;
-      const scaledWidth = viewportWidth * scale;
-      
-      // Set container scroll size by adding padding to wrapper
+      // Enable scrolling by adding padding to create scroll area
       if (scale > 1) {
-        wrapper.style.marginBottom = (scaledHeight - viewportHeight) + 'px';
-        wrapper.style.marginRight = (scaledWidth - viewportWidth) + 'px';
+        const extraSpace = ((scale - 1) * 50);
+        wrapper.style.padding = `${extraSpace}% ${extraSpace}%`;
+      } else if (scale < 1) {
+        // For zoom out, ensure content stays visible
+        wrapper.style.padding = '0';
       } else {
-        wrapper.style.marginBottom = '0';
-        wrapper.style.marginRight = '0';
+        wrapper.style.padding = '0';
       }
       
       zoomLevelDisplay.textContent = Math.round(scale * 100) + '%';
@@ -299,35 +286,39 @@
       updateZoom();
     }
     
-    // Pinch to zoom - overlay always on, hide instantly for 1 finger
+    // Pinch to zoom - overlay always active
     let touching = false;
-    let isZooming = false;
+    let lastTouchCount = 0;
     
     overlay.addEventListener('touchstart', function(e) {
+      lastTouchCount = e.touches.length;
+      
       if (e.touches.length === 2) {
-        // Two fingers - zoom
+        // Two fingers - zoom mode
         e.preventDefault();
         e.stopPropagation();
-        isZooming = true;
         touching = true;
-        overlay.style.pointerEvents = 'auto';
         initialDistance = getDistance(e.touches[0], e.touches[1]);
         lastScale = scale;
       } else if (e.touches.length === 1) {
-        // One finger - hide overlay immediately to let touch pass to iframe
+        // One finger - pass through to iframe by temporarily hiding overlay
         overlay.style.pointerEvents = 'none';
         
-        // Re-enable after very short delay
-        setTimeout(function() {
-          if (!isZooming) {
-            overlay.style.pointerEvents = 'auto';
-          }
-        }, 50);
+        // Forward the touch to iframe
+        setTimeout(() => {
+          overlay.style.pointerEvents = 'auto';
+        }, 10);
       }
     }, { passive: false });
     
     overlay.addEventListener('touchmove', function(e) {
-      if (e.touches.length === 2 && touching) {
+      if (e.touches.length === 2) {
+        if (!touching) {
+          // Second finger added during move
+          touching = true;
+          initialDistance = getDistance(e.touches[0], e.touches[1]);
+          lastScale = scale;
+        }
         e.preventDefault();
         e.stopPropagation();
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
@@ -340,9 +331,7 @@
     overlay.addEventListener('touchend', function(e) {
       if (e.touches.length < 2) {
         touching = false;
-        isZooming = false;
-        // Re-enable overlay
-        overlay.style.pointerEvents = 'auto';
+        lastTouchCount = e.touches.length;
       }
     }, { passive: false });
     
