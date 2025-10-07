@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=0.5, maximum-scale=5.0" />
+  <title>Raporlar – Hi‑Ka Araç Yönetimi</title>
+  <link rel="icon" href="./assets/logo-120.png" type="image/png">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      height: 100%; 
+      width: 100%;
+      overflow: hidden;
+    }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: #1a1f28;
+    }
+    
+    /* Header */
+    .header {
+      background: linear-gradient(180deg, rgba(20,24,32,.95), rgba(20,24,32,.92));
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: 60px;
+    }
+    
+    .brand {
+      display: flex;
+      align-items: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    
+    .brand img {
+      width: 28px;
+      height: 28px;
+      margin-right: 10px;
+      border-radius: 6px;
+    }
+    
+    .back-btn {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.2);
+      color: #fff;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    
+    .back-btn:hover {
+      background: rgba(255,255,255,.15);
+    }
+    
+    /* Document Container */
+    .doc-container {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #fff;
+    }
+    
+    .doc-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+    
+    /* Loading */
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #666;
+      font-size: 16px;
+      text-align: center;
+    }
+    
+    .loading::after {
+      content: '...';
+      animation: dots 1.5s infinite;
+    }
+    
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+    
+    /* Mobile */
+    @media (max-width: 768px) {
+      .header {
+        padding: 10px 16px;
+        height: 56px;
+      }
+      
+      .brand {
+        font-size: 14px;
+      }
+      
+      .brand img {
+        width: 24px;
+        height: 24px;
+        margin-right: 8px;
+      }
+      
+      .back-btn {
+        padding: 6px 10px;
+        font-size: 13px;
+      }
+      
+      .doc-container {
+        top: 56px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="brand">
+      <img src="./assets/logo-120.png" alt="HİKA Logo">
+      <span>Raporlar</span>
+    </div>
+    <a href="./index.html" class="back-btn">← Ana Sayfa</a>
+  </div>
+  
+  <div class="doc-container">
+    <div class="loading">Rapor yükleniyor</div>
+    <iframe 
+      class="doc-frame"
+      src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTcqImwmoqI14CTwD5adZzRUworW9fMkwFoeSRykMvsdE4YWlo0uhm_mCtadhktzESwoOJKe2MmcrnP/pubhtml?gid=1490004875&single=true&rm=minimal&widget=false"
+      allow="fullscreen"
+      loading="eager"
+      onload="document.querySelector('.loading').style.display='none'"
+    ></iframe>
+  </div>
+</body>
+</html>
+
