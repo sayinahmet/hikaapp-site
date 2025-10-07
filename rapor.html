@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=0.1, maximum-scale=5.0" />
-  <title>Raporlar – Hi‑Ka Araç Yönetimi</title>
+  <title>Raporlar – Hi-Ka Araç Yönetimi</title>
   <link rel="icon" href="./assets/logo-120.png" type="image/png">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -16,8 +16,6 @@
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       background: #1a1f28;
     }
-    
-    /* Header */
     .header {
       background: linear-gradient(180deg, rgba(20,24,32,.95), rgba(20,24,32,.92));
       backdrop-filter: blur(10px);
@@ -33,7 +31,6 @@
       z-index: 1000;
       height: 60px;
     }
-    
     .brand {
       display: flex;
       align-items: center;
@@ -41,14 +38,12 @@
       font-weight: 700;
       font-size: 16px;
     }
-    
     .brand img {
       width: 28px;
       height: 28px;
       margin-right: 10px;
       border-radius: 6px;
     }
-    
     .back-btn {
       display: inline-block;
       padding: 8px 14px;
@@ -60,12 +55,9 @@
       font-size: 14px;
       transition: all 0.2s;
     }
-    
     .back-btn:hover {
       background: rgba(255,255,255,.15);
     }
-    
-    /* Zoom Controls */
     .zoom-controls {
       position: fixed;
       bottom: 20px;
@@ -75,7 +67,6 @@
       flex-direction: column;
       gap: 10px;
     }
-    
     .zoom-btn {
       width: 50px;
       height: 50px;
@@ -96,20 +87,16 @@
       line-height: 1;
       padding: 0;
     }
-    
-    /* Desktop için daha iyi hizalama */
     @media (min-width: 769px) {
       .zoom-btn {
         line-height: 1;
         padding-bottom: 4px;
       }
     }
-    
     .zoom-btn:active {
       transform: scale(0.95);
       background: rgba(20,24,32,1);
     }
-    
     .zoom-level {
       width: 50px;
       height: 30px;
@@ -124,8 +111,6 @@
       justify-content: center;
       box-shadow: 0 4px 12px rgba(0,0,0,.3);
     }
-    
-    /* Document Container */
     .doc-container {
       position: fixed;
       top: 60px;
@@ -136,17 +121,12 @@
       overflow: auto;
       -webkit-overflow-scrolling: touch;
     }
-    
     .doc-wrapper {
       width: 100%;
       height: 100%;
-      min-width: 100%;
-      min-height: 100%;
-      transform-origin: center center;
+      transform-origin: 0 0;
       transition: transform 0.1s ease-out;
-      position: relative;
     }
-    
     .doc-frame {
       width: 100%;
       height: 100%;
@@ -154,26 +134,6 @@
       display: block;
       pointer-events: auto;
     }
-    
-    .touch-overlay {
-      position: fixed;
-      top: 60px;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 999;
-      pointer-events: auto;
-      background: transparent;
-      touch-action: none;
-    }
-    
-    @media (max-width: 768px) {
-      .touch-overlay {
-        top: 56px;
-      }
-    }
-    
-    /* Loading */
     .loading {
       position: absolute;
       top: 50%;
@@ -183,43 +143,21 @@
       font-size: 16px;
       text-align: center;
     }
-    
     .loading::after {
       content: '...';
       animation: dots 1.5s infinite;
     }
-    
     @keyframes dots {
       0%, 20% { content: '.'; }
       40% { content: '..'; }
       60%, 100% { content: '...'; }
     }
-    
-    /* Mobile */
     @media (max-width: 768px) {
-      .header {
-        padding: 10px 16px;
-        height: 56px;
-      }
-      
-      .brand {
-        font-size: 14px;
-      }
-      
-      .brand img {
-        width: 24px;
-        height: 24px;
-        margin-right: 8px;
-      }
-      
-      .back-btn {
-        padding: 6px 10px;
-        font-size: 13px;
-      }
-      
-      .doc-container {
-        top: 56px;
-      }
+      .header { padding: 10px 16px; height: 56px; }
+      .brand { font-size: 14px; }
+      .brand img { width: 24px; height: 24px; margin-right: 8px; }
+      .back-btn { padding: 6px 10px; font-size: 13px; }
+      .doc-container { top: 56px; }
     }
   </style>
 </head>
@@ -240,16 +178,14 @@
 
   <div class="doc-container" id="container">
     <div class="loading">Rapor yükleniyor</div>
-    <div class="touch-overlay" id="overlay"></div>
     <div class="doc-wrapper" id="wrapper">
       <iframe 
         class="doc-frame"
-        id="iframe"
-        src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTcqImwmoqI14CTwD5adZzRUworW9fMkwFoeSRykMvsdE4YWlo0uhm_mCtadhktzESwoOJKe2MmcrnP/pubhtml?gid=1490004875&single=true&rm=minimal&widget=false"
+        src="https://resonant-mousse-7db67b.netlify.app/.netlify/functions/sheet-proxy"
         allow="fullscreen"
         loading="eager"
-        onload="document.querySelector('.loading').style.display='none'"
-      ></iframe>
+        onload="document.querySelector('.loading').style.display='none'">
+      </iframe>
     </div>
   </div>
 
@@ -257,140 +193,56 @@
     let scale = 1;
     let lastScale = 1;
     let initialDistance = 0;
-    
     const wrapper = document.getElementById('wrapper');
     const container = document.getElementById('container');
-    const overlay = document.getElementById('overlay');
-    const iframe = document.getElementById('iframe');
     const zoomLevelDisplay = document.getElementById('zoomLevel');
     
     function updateZoom() {
-      // Save current scroll position and center point
-      const scrollX = container.scrollLeft;
-      const scrollY = container.scrollTop;
-      const centerX = scrollX + container.clientWidth / 2;
-      const centerY = scrollY + container.clientHeight / 2;
-      
-      // Apply scale transform
       wrapper.style.transform = `scale(${scale})`;
-      
-      // Adjust wrapper dimensions inversely to maintain content size
       wrapper.style.width = `${100 / scale}%`;
       wrapper.style.height = `${100 / scale}%`;
-      
-      // Calculate scroll area based on scale
-      const containerWidth = container.clientWidth;
-      const containerHeight = container.clientHeight;
-      
-      // Set minimum dimensions to enable scrolling
-      if (scale !== 1) {
-        const scaledWidth = containerWidth * scale;
-        const scaledHeight = containerHeight * scale;
-        wrapper.style.minWidth = scaledWidth + 'px';
-        wrapper.style.minHeight = scaledHeight + 'px';
-        
-        // Adjust scroll to maintain center point
-        setTimeout(() => {
-          container.scrollLeft = centerX * scale - container.clientWidth / 2;
-          container.scrollTop = centerY * scale - container.clientHeight / 2;
-        }, 0);
-      } else {
-        wrapper.style.minWidth = '100%';
-        wrapper.style.minHeight = '100%';
-      }
-      
       zoomLevelDisplay.textContent = Math.round(scale * 100) + '%';
     }
-    
-    // Button zoom controls
     function zoomIn() {
-      scale = Math.min(scale + 0.25, 5);
+      scale = Math.min(scale + 0.1, 5);
       updateZoom();
     }
-    
     function zoomOut() {
-      scale = Math.max(scale - 0.25, 0.1);
+      scale = Math.max(scale - 0.1, 0.1);
       updateZoom();
     }
-    
-    // Pinch to zoom - overlay always active
     let touching = false;
-    let lastTouchCount = 0;
-    
-    overlay.addEventListener('touchstart', function(e) {
-      lastTouchCount = e.touches.length;
-      
+    container.addEventListener('touchstart', function(e) {
       if (e.touches.length === 2) {
-        // Two fingers - zoom mode
-        e.preventDefault();
-        e.stopPropagation();
         touching = true;
+        e.preventDefault();
         initialDistance = getDistance(e.touches[0], e.touches[1]);
         lastScale = scale;
-      } else if (e.touches.length === 1) {
-        // One finger - pass through to iframe by temporarily hiding overlay
-        overlay.style.pointerEvents = 'none';
-        
-        // Forward the touch to iframe
-        setTimeout(() => {
-          overlay.style.pointerEvents = 'auto';
-        }, 10);
       }
     }, { passive: false });
-    
-    overlay.addEventListener('touchmove', function(e) {
-      if (e.touches.length === 2) {
-        if (!touching) {
-          // Second finger added during move
-          touching = true;
-          initialDistance = getDistance(e.touches[0], e.touches[1]);
-          lastScale = scale;
-        }
+    container.addEventListener('touchmove', function(e) {
+      if (e.touches.length === 2 && touching) {
         e.preventDefault();
-        e.stopPropagation();
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
-        const newScale = lastScale * (currentDistance / initialDistance);
-        scale = Math.min(Math.max(0.1, newScale), 5);
+        scale = lastScale * (currentDistance / initialDistance);
+        scale = Math.min(Math.max(0.1, scale), 5);
         updateZoom();
       }
     }, { passive: false });
-    
-    overlay.addEventListener('touchend', function(e) {
-      if (e.touches.length < 2) {
-        touching = false;
-        lastTouchCount = e.touches.length;
-      }
-    }, { passive: false });
-    
-    // Prevent default pinch zoom on document
-    document.addEventListener('gesturestart', function(e) {
-      e.preventDefault();
+    container.addEventListener('touchend', function(e) {
+      if (e.touches.length < 2) touching = false;
     });
-    
-    document.addEventListener('gesturechange', function(e) {
-      e.preventDefault();
-    });
-    
-    document.addEventListener('gestureend', function(e) {
-      e.preventDefault();
-    });
-    
-    function getDistance(touch1, touch2) {
-      const dx = touch1.clientX - touch2.clientX;
-      const dy = touch1.clientY - touch2.clientY;
+    function getDistance(t1, t2) {
+      const dx = t1.clientX - t2.clientX;
+      const dy = t1.clientY - t2.clientY;
       return Math.sqrt(dx * dx + dy * dy);
     }
-    
-    // Prevent default zoom on double tap
     let lastTouchEnd = 0;
     document.addEventListener('touchend', function(e) {
       const now = Date.now();
-      if (now - lastTouchEnd <= 300) {
-        e.preventDefault();
-      }
+      if (now - lastTouchEnd <= 300) e.preventDefault();
       lastTouchEnd = now;
     }, false);
   </script>
 </body>
 </html>
-
