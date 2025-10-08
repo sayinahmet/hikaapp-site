@@ -290,6 +290,7 @@
     
     // Pinch zoom - overlay yakalar, 1 parmakta iframe'e geçirir
     let lastDistance = null;
+    let singleTouchActive = false;
     
     overlay.addEventListener('touchstart', function(e) {
       if (e.touches.length === 2) {
@@ -297,11 +298,9 @@
         e.stopPropagation();
         lastDistance = getDistance(e.touches[0], e.touches[1]);
       } else if (e.touches.length === 1) {
-        // 1 parmak scroll: overlay'i geçici kapat
+        // 1 parmak scroll: overlay'i dokunuş bitene kadar kapat
+        singleTouchActive = true;
         overlay.style.pointerEvents = 'none';
-        requestAnimationFrame(() => {
-          overlay.style.pointerEvents = 'auto';
-        });
       }
     }, { passive: false });
     
@@ -323,6 +322,14 @@
         lastDistance = null;
       }
     }, { passive: false });
+
+    // Dokunuş tamamen bittiğinde overlay'i tekrar etkinleştir
+    document.addEventListener('touchend', function(e) {
+      if (singleTouchActive && e.touches.length === 0) {
+        overlay.style.pointerEvents = 'auto';
+        singleTouchActive = false;
+      }
+    }, { passive: true, capture: true });
     
     // Prevent default pinch zoom on document
     document.addEventListener('gesturestart', function(e) {
