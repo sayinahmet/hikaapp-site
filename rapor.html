@@ -133,7 +133,7 @@
       right: 0;
       bottom: 0;
       background: #fff;
-      overflow: hidden;
+      overflow: auto; /* pan için container scroll kullanılacak */
       -webkit-overflow-scrolling: touch;
     }
     
@@ -264,11 +264,10 @@
     const zoomLevelDisplay = document.getElementById('zoomLevel');
     
     function updateZoom() {
-      // Wrapper'ı ölçeğe ters oranda büyüt ki içerik boşluk bırakmadan görünsün
-      wrapper.style.width = `${100 / scale}%`;
-      wrapper.style.height = `${100 / scale}%`;
-
-      // Sadece içeriği ölçekle
+      // Container scroll'u korumak için wrapper sabit boyutta kalsın
+      wrapper.style.width = '100%';
+      wrapper.style.height = '100%';
+      wrapper.style.transformOrigin = '0 0';
       wrapper.style.transform = `scale(${scale})`;
 
       zoomLevelDisplay.textContent = Math.round(scale * 100) + '%';
@@ -319,7 +318,6 @@
         // Eğer 1 parmakla başladı ve ikinci parmak eklendiyse burada başlat
         if (initialDistance === 0) {
           overlay.classList.add('active');
-          overlay.style.pointerEvents = 'auto';
           iframe.style.pointerEvents = 'none';
           singleTouch = false;
           initialDistance = getDistance(e.touches[0], e.touches[1]);
