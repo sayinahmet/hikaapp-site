@@ -159,7 +159,7 @@
         right: 0;
         bottom: 0;
         z-index: 9999;
-        pointer-events: auto; /* ilk dokunuşu biz yakalayalım */
+        pointer-events: none; /* varsayılan: scroll için iframe'e geçsin */
         background: transparent;
         touch-action: none; /* tarayıcı pinch/zoom devre dışı */
       }
@@ -299,6 +299,7 @@
       if (e.touches.length === 2) {
         // Pinch başlıyor → overlay aktif, iframe pasif
         overlay.classList.add('active');
+        overlay.style.pointerEvents = 'auto';
         iframe.style.pointerEvents = 'none';
         initialDistance = getDistance(e.touches[0], e.touches[1]);
         lastScale = scale;
@@ -306,11 +307,10 @@
       } else if (e.touches.length === 1) {
         // 1 parmak başlangıç: scroll'a izin vermek için anlık pass-through
         overlay.classList.remove('active');
+        overlay.style.pointerEvents = 'none';
         iframe.style.pointerEvents = 'auto';
         singleTouch = true;
-        // İlk frame'de overlay'i kapat, sonra tekrar aç ki yeni iki parmakta yakalayalım
-        overlay.style.pointerEvents = 'none';
-        requestAnimationFrame(() => { overlay.style.pointerEvents = 'auto'; });
+        // Not: pointerEvents 'none' olarak kalır, 2. parmakta tekrar 'auto' yapılır
       }
     }, { passive: false, capture: true });
     
@@ -319,6 +319,7 @@
         // Eğer 1 parmakla başladı ve ikinci parmak eklendiyse burada başlat
         if (initialDistance === 0) {
           overlay.classList.add('active');
+          overlay.style.pointerEvents = 'auto';
           iframe.style.pointerEvents = 'none';
           singleTouch = false;
           initialDistance = getDistance(e.touches[0], e.touches[1]);
@@ -337,13 +338,13 @@
       if (e.touches.length < 2) {
         // Pinch bitti → overlay pasif, iframe scroll aç
         overlay.classList.remove('active');
+        overlay.style.pointerEvents = 'none';
         iframe.style.pointerEvents = 'auto';
         initialDistance = 0;
         lastScale = scale;
         // Tek dokunuş bitene kadar overlay kapalı; parmak kalkınca geri aç
         if (singleTouch && e.touches.length === 0) {
           overlay.style.pointerEvents = 'none';
-          requestAnimationFrame(() => { overlay.style.pointerEvents = 'none'; });
           singleTouch = false;
         }
       }
