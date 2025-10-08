@@ -294,6 +294,8 @@
     }
     
     // Overlay tüm içerikte; 1 parmakta olay iframe'e geçsin diye anlık kapat
+    let singleTouch = false;
+
     document.addEventListener('touchstart', function(e) {
       if (e.touches.length === 2) {
         // Pinch başlıyor → overlay aktif, iframe pasif
@@ -306,9 +308,9 @@
         // 1 parmak → overlay pasif, iframe scroll aktif
         overlay.classList.remove('active');
         iframe.style.pointerEvents = 'auto';
-        // 1 frame için overlay'i kapat ki olay iframe'e geçsin
+        // Dokunuş boyunca overlay'i kapalı tut
+        singleTouch = true;
         overlay.style.pointerEvents = 'none';
-        requestAnimationFrame(() => { overlay.style.pointerEvents = 'auto'; });
       }
     }, { passive: false, capture: true });
     
@@ -317,7 +319,9 @@
         // Eğer 1 parmakla başladı ve ikinci parmak eklendiyse burada başlat
         if (initialDistance === 0) {
           overlay.classList.add('active');
+          overlay.style.pointerEvents = 'auto';
           iframe.style.pointerEvents = 'none';
+          singleTouch = false;
           initialDistance = getDistance(e.touches[0], e.touches[1]);
           lastScale = scale;
         }
@@ -337,6 +341,11 @@
         iframe.style.pointerEvents = 'auto';
         initialDistance = 0;
         lastScale = scale;
+        if (e.touches.length === 0) {
+          // Tek dokunuş bitti → overlay'i tekrar aç
+          overlay.style.pointerEvents = 'auto';
+          singleTouch = false;
+        }
       }
     }, { passive: false, capture: true });
     
