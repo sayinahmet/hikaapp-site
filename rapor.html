@@ -158,10 +158,14 @@
         left: 0;
         right: 0;
         bottom: 0;
-        z-index: 9999;
-        pointer-events: auto;
+        z-index: 1000;
+        pointer-events: none;
         background: transparent;
         touch-action: none;
+      }
+      
+      .touch-overlay.active {
+        pointer-events: auto;
       }
       
       .touch-overlay.active {
@@ -288,26 +292,22 @@
       updateZoom();
     }
     
-    // Pinch zoom - overlay yakalar, 1 parmakta iframe'e geçirir
+    // Basit: 2 parmakta overlay aktif, 1 parmakta pasif
     let lastDistance = null;
-    let singleTouchActive = false;
     
-    overlay.addEventListener('touchstart', function(e) {
+    document.addEventListener('touchstart', function(e) {
       if (e.touches.length === 2) {
-        e.preventDefault();
-        e.stopPropagation();
+        overlay.classList.add('active');
         lastDistance = getDistance(e.touches[0], e.touches[1]);
-      } else if (e.touches.length === 1) {
-        // 1 parmak scroll: overlay'i dokunuş bitene kadar kapat
-        singleTouchActive = true;
-        overlay.style.pointerEvents = 'none';
+        e.preventDefault();
+      } else {
+        overlay.classList.remove('active');
       }
-    }, { passive: false });
+    }, { passive: false, capture: true });
     
-    overlay.addEventListener('touchmove', function(e) {
+    document.addEventListener('touchmove', function(e) {
       if (e.touches.length === 2 && lastDistance) {
         e.preventDefault();
-        e.stopPropagation();
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
         const delta = currentDistance - lastDistance;
         const sensitivity = 0.005;
@@ -315,21 +315,14 @@
         updateZoom();
         lastDistance = currentDistance;
       }
-    }, { passive: false });
+    }, { passive: false, capture: true });
     
-    overlay.addEventListener('touchend', function(e) {
+    document.addEventListener('touchend', function(e) {
       if (e.touches.length < 2) {
+        overlay.classList.remove('active');
         lastDistance = null;
       }
-    }, { passive: false });
-
-    // Dokunuş tamamen bittiğinde overlay'i tekrar etkinleştir
-    document.addEventListener('touchend', function(e) {
-      if (singleTouchActive && e.touches.length === 0) {
-        overlay.style.pointerEvents = 'auto';
-        singleTouchActive = false;
-      }
-    }, { passive: true, capture: true });
+    }, { passive: false, capture: true });
     
     // Prevent default pinch zoom on document
     document.addEventListener('gesturestart', function(e) {
