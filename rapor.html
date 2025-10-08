@@ -345,9 +345,9 @@
         iframe.style.pointerEvents = 'auto';
         initialDistance = 0;
         lastScale = scale;
-        // Tek dokunuş bitti → overlay yine kapalı kalsın; yeni pinch'te 2. parmakta açılacak
+        // Tek dokunuş bitti → overlay'i tekrar aç; bir sonraki pinch her yerde yakalansın
         if (singleTouch && e.touches.length === 0) {
-          overlay.style.pointerEvents = 'none';
+          overlay.style.pointerEvents = 'auto';
           singleTouch = false;
         }
       }
