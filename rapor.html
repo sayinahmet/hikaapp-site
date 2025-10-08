@@ -158,8 +158,8 @@
         left: 0;
         right: 0;
         bottom: 0;
-        z-index: 1000;
-        pointer-events: none;
+        z-index: 9999;
+        pointer-events: auto;
         background: transparent;
         touch-action: none;
       }
@@ -295,19 +295,24 @@
     // Basit: 2 parmakta overlay aktif, 1 parmakta pasif
     let lastDistance = null;
     
-    document.addEventListener('touchstart', function(e) {
+    overlay.addEventListener('touchstart', function(e) {
       if (e.touches.length === 2) {
-        overlay.classList.add('active');
         lastDistance = getDistance(e.touches[0], e.touches[1]);
         e.preventDefault();
-      } else {
-        overlay.classList.remove('active');
+        e.stopPropagation();
+      } else if (e.touches.length === 1) {
+        // 1 parmak: touch'u iframe'e geçir
+        overlay.style.pointerEvents = 'none';
+        requestAnimationFrame(() => {
+          overlay.style.pointerEvents = 'auto';
+        });
       }
-    }, { passive: false, capture: true });
+    }, { passive: false });
     
-    document.addEventListener('touchmove', function(e) {
+    overlay.addEventListener('touchmove', function(e) {
       if (e.touches.length === 2 && lastDistance) {
         e.preventDefault();
+        e.stopPropagation();
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
         const delta = currentDistance - lastDistance;
         const sensitivity = 0.005;
@@ -315,14 +320,13 @@
         updateZoom();
         lastDistance = currentDistance;
       }
-    }, { passive: false, capture: true });
+    }, { passive: false });
     
-    document.addEventListener('touchend', function(e) {
+    overlay.addEventListener('touchend', function(e) {
       if (e.touches.length < 2) {
-        overlay.classList.remove('active');
         lastDistance = null;
       }
-    }, { passive: false, capture: true });
+    }, { passive: false });
     
     // Prevent default pinch zoom on document
     document.addEventListener('gesturestart', function(e) {
