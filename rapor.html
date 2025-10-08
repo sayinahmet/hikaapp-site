@@ -159,7 +159,7 @@
         right: 0;
         bottom: 0;
         z-index: 9999;
-        pointer-events: auto; /* 2 parmakta kesin yakala */
+        pointer-events: none; /* default: 1 parmak scroll için kapalı */
         background: transparent;
         touch-action: none; /* tarayıcı pinch/zoom devre dışı */
       }
@@ -345,9 +345,9 @@
         iframe.style.pointerEvents = 'auto';
         initialDistance = 0;
         lastScale = scale;
-        // Tek dokunuş bittiyse: overlay'i yeniden aç ki sonraki pinch her yerde yakalansın
+        // Tek dokunuş bitti → overlay yine kapalı kalsın; yeni pinch'te 2. parmakta açılacak
         if (singleTouch && e.touches.length === 0) {
-          overlay.style.pointerEvents = 'auto';
+          overlay.style.pointerEvents = 'none';
           singleTouch = false;
         }
       }
