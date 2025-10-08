@@ -159,12 +159,10 @@
         right: 0;
         bottom: 0;
         z-index: 9999;
-        pointer-events: none; /* default kapalı - 1 parmak scroll için */
+        pointer-events: auto; /* tüm ekranda dokunuşları yakala */
         background: transparent;
         touch-action: none; /* tarayıcı pinch/zoom devre dışı */
       }
-      
-      .touch-overlay.active { pointer-events: auto; }
       
       @media (max-width: 768px) {
         .touch-overlay {
@@ -294,22 +292,20 @@
       updateZoom();
     }
     
-    document.addEventListener('touchstart', function(e) {
+    overlay.addEventListener('touchstart', function(e) {
       if (e.touches.length === 2) {
         // Pinch başlıyor → overlay aktif, iframe pasif
-        overlay.classList.add('active');
         iframe.style.pointerEvents = 'none';
         initialDistance = getDistance(e.touches[0], e.touches[1]);
         lastScale = scale;
         e.preventDefault();
       } else if (e.touches.length === 1) {
         // 1 parmak → overlay pasif, iframe scroll aktif
-        overlay.classList.remove('active');
         iframe.style.pointerEvents = 'auto';
       }
-    }, { passive: false, capture: true });
+    }, { passive: false });
     
-    document.addEventListener('touchmove', function(e) {
+    overlay.addEventListener('touchmove', function(e) {
       if (e.touches.length === 2 && initialDistance > 0) {
         e.preventDefault();
         e.stopPropagation();
@@ -318,17 +314,16 @@
         scale = Math.max(0.1, Math.min(5, lastScale * ratio));
         if (!rafId) rafId = requestAnimationFrame(applyZoomSmooth);
       }
-    }, { passive: false, capture: true });
+    }, { passive: false });
     
-    document.addEventListener('touchend', function(e) {
+    overlay.addEventListener('touchend', function(e) {
       if (e.touches.length < 2) {
-        // Pinch bitti → overlay kapat, iframe scroll aç
-        overlay.classList.remove('active');
+        // Pinch bitti → iframe scroll aç
         iframe.style.pointerEvents = 'auto';
         initialDistance = 0;
         lastScale = scale;
       }
-    }, { passive: false, capture: true });
+    }, { passive: false });
     
     // Prevent default pinch zoom on document
     document.addEventListener('gesturestart', function(e) {
