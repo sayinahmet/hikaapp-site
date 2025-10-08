@@ -267,11 +267,11 @@
     const zoomLevelDisplay = document.getElementById('zoomLevel');
     
     function updateZoom() {
-      // Keep wrapper fixed size; only transform scales the iframe content
-      wrapper.style.width = '100%';
-      wrapper.style.height = '100%';
+      // Wrapper'ı ölçeğe ters oranda büyüt ki içerik boşluk bırakmadan görünsün
+      wrapper.style.width = `${100 / scale}%`;
+      wrapper.style.height = `${100 / scale}%`;
 
-      // Apply scale transform
+      // Sadece içeriği ölçekle
       wrapper.style.transform = `scale(${scale})`;
 
       zoomLevelDisplay.textContent = Math.round(scale * 100) + '%';
