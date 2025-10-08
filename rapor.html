@@ -153,8 +153,8 @@
     }
     
       .touch-overlay {
-        position: fixed;
-        top: 60px;
+        position: absolute;
+        top: 0;
         left: 0;
         right: 0;
         bottom: 0;
@@ -166,12 +166,6 @@
       
       .touch-overlay.active {
         pointer-events: auto;
-      }
-      
-      @media (max-width: 768px) {
-        .touch-overlay {
-          top: 56px;
-        }
       }
     
     /* Loading */
