@@ -159,7 +159,7 @@
         right: 0;
         bottom: 0;
         z-index: 9999;
-        pointer-events: auto; /* default: pinch her yerde yakalansın */
+        pointer-events: none; /* varsayılan: scroll için iframe'e izin ver */
         background: transparent;
         touch-action: none; /* tarayıcı pinch/zoom devre dışı */
       }
@@ -345,9 +345,9 @@
         iframe.style.pointerEvents = 'auto';
         initialDistance = 0;
         lastScale = scale;
-        // Tek dokunuş bitti → overlay'i tekrar aç; bir sonraki pinch her yerde yakalansın
+        // Tek dokunuş bitti → önce scroll'a izin ver, bir frame sonra overlay'i aç
         if (singleTouch && e.touches.length === 0) {
-          overlay.style.pointerEvents = 'auto';
+          requestAnimationFrame(() => { overlay.style.pointerEvents = 'auto'; });
           singleTouch = false;
         }
       }
