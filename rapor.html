@@ -158,10 +158,14 @@
         left: 0;
         right: 0;
         bottom: 0;
-        z-index: 1000;
-        pointer-events: auto;
+        z-index: 9999;
+        pointer-events: none;
         background: transparent;
         touch-action: none;
+      }
+      
+      .touch-overlay.active {
+        pointer-events: auto;
       }
       
       @media (max-width: 768px) {
@@ -284,52 +288,42 @@
       updateZoom();
     }
     
-    // Pinch to zoom - overlay always on top
+    // Simple pinch zoom - detect at document level
     let lastDistance = null;
-    let isZooming = false;
     
-    // Overlay catches all touches
-    overlay.addEventListener('touchstart', function(e) {
+    document.addEventListener('touchstart', function(e) {
       if (e.touches.length === 2) {
-        // Two fingers - zoom mode
-        e.preventDefault();
-        e.stopPropagation();
-        isZooming = true;
+        // Two fingers - activate overlay for zoom
+        overlay.classList.add('active');
         lastDistance = getDistance(e.touches[0], e.touches[1]);
-      } else if (e.touches.length === 1) {
-        // One finger - let it pass to iframe
-        isZooming = false;
-        overlay.style.pointerEvents = 'none';
-        // Re-enable overlay after a brief moment
-        setTimeout(() => {
-          overlay.style.pointerEvents = 'auto';
-        }, 50);
-      }
-    }, { passive: false });
-    
-    overlay.addEventListener('touchmove', function(e) {
-      if (e.touches.length === 2 && isZooming && lastDistance) {
         e.preventDefault();
-        e.stopPropagation();
+      } else {
+        // One finger - deactivate overlay, let iframe scroll
+        overlay.classList.remove('active');
+      }
+    }, { passive: false, capture: true });
+    
+    document.addEventListener('touchmove', function(e) {
+      if (e.touches.length === 2 && lastDistance) {
+        e.preventDefault();
         
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
         const delta = currentDistance - lastDistance;
         const sensitivity = 0.005;
         
-        // Directly adjust scale based on distance change
         scale = Math.max(0.1, Math.min(5, scale + (delta * sensitivity)));
         updateZoom();
         
         lastDistance = currentDistance;
       }
-    }, { passive: false });
+    }, { passive: false, capture: true });
     
-    overlay.addEventListener('touchend', function(e) {
+    document.addEventListener('touchend', function(e) {
       if (e.touches.length < 2) {
         lastDistance = null;
-        isZooming = false;
+        overlay.classList.remove('active');
       }
-    }, { passive: false });
+    }, { passive: false, capture: true });
     
     // Prevent default pinch zoom on document
     document.addEventListener('gesturestart', function(e) {
