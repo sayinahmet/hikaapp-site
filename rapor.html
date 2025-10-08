@@ -154,11 +154,11 @@
     
       .touch-overlay {
         position: fixed;
-        top: 60px; /* Header height */
+        top: 60px;
         left: 0;
         right: 0;
         bottom: 0;
-        z-index: 1000;
+        z-index: 100;
         pointer-events: none;
         background: transparent;
         touch-action: none;
@@ -239,9 +239,8 @@
     <div class="zoom-btn" onclick="zoomOut()">−</div>
   </div>
 
-  <div class="touch-overlay" id="overlay"></div>
-
   <div class="doc-container" id="container">
+    <div class="touch-overlay" id="overlay"></div>
     <div class="loading">Rapor yükleniyor</div>
     <div class="doc-wrapper" id="wrapper">
       <iframe 
