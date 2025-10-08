@@ -159,7 +159,7 @@
         right: 0;
         bottom: 0;
         z-index: 9999;
-        pointer-events: auto; /* tüm içerikte dokunuşları yakala */
+        pointer-events: none; /* varsayılan: 1 parmak scroll için kapalı */
         background: transparent;
         touch-action: none; /* tarayıcı pinch/zoom devre dışı */
       }
@@ -307,7 +307,7 @@
         // 1 parmak → overlay pasif, iframe scroll aktif
         overlay.classList.remove('active');
         iframe.style.pointerEvents = 'auto';
-        // Dokunuş boyunca overlay'i kapalı tut
+        // Overlay'i kapalı tut ki tüm hareket iframe'e gitsin
         singleTouch = true;
         overlay.style.pointerEvents = 'none';
       }
@@ -339,9 +339,10 @@
         iframe.style.pointerEvents = 'auto';
         initialDistance = 0;
         lastScale = scale;
-        if (e.touches.length === 0) {
-          // Tek dokunuş bitti → overlay'i tekrar aç
-          overlay.style.pointerEvents = 'auto';
+        // Tek dokunuş bitene kadar overlay kapalı; parmak kalkınca geri aç
+        if (singleTouch && e.touches.length === 0) {
+          overlay.style.pointerEvents = 'none';
+          requestAnimationFrame(() => { overlay.style.pointerEvents = 'none'; });
           singleTouch = false;
         }
       }
