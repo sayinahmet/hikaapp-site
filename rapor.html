@@ -133,7 +133,7 @@
       right: 0;
       bottom: 0;
       background: #fff;
-      overflow: scroll;
+      overflow: auto;
       -webkit-overflow-scrolling: touch;
     }
     
@@ -141,6 +141,7 @@
       width: 100%;
       height: 100%;
       transform-origin: 0 0;
+      transition: transform 0.1s ease-out;
       position: relative;
     }
     
@@ -153,25 +154,15 @@
     }
     
     .touch-overlay {
-      position: fixed;
-      top: 60px;
+      position: absolute;
+      top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      z-index: 1000;
-      pointer-events: none;
+      z-index: 10;
+      pointer-events: auto;
       background: transparent;
       touch-action: none;
-    }
-    
-    .touch-overlay.active {
-      pointer-events: auto;
-    }
-    
-    @media (max-width: 768px) {
-      .touch-overlay {
-        top: 56px;
-      }
     }
     
     /* Loading */
@@ -239,11 +230,10 @@
     <div class="zoom-btn" onclick="zoomOut()">−</div>
   </div>
 
-  <div class="touch-overlay" id="overlay"></div>
-
   <div class="doc-container" id="container">
     <div class="loading">Rapor yükleniyor</div>
     <div class="doc-wrapper" id="wrapper">
+      <div class="touch-overlay" id="overlay"></div>
       <iframe 
         class="doc-frame"
         id="iframe"
@@ -267,81 +257,85 @@
     const zoomLevelDisplay = document.getElementById('zoomLevel');
     
     function updateZoom() {
-      // Set wrapper size inversely to scale
+      wrapper.style.transform = `scale(${scale})`;
       wrapper.style.width = `${100 / scale}%`;
       wrapper.style.height = `${100 / scale}%`;
       
-      // Apply scale transform
-      wrapper.style.transform = `scale(${scale})`;
+      // Enable scrolling by setting minimum dimensions
+      const viewportWidth = container.clientWidth;
+      const viewportHeight = container.clientHeight;
+      wrapper.style.minWidth = (viewportWidth / scale) + 'px';
+      wrapper.style.minHeight = (viewportHeight / scale) + 'px';
       
       zoomLevelDisplay.textContent = Math.round(scale * 100) + '%';
     }
     
     // Button zoom controls
     function zoomIn() {
-      scale = Math.min(scale + 0.25, 5);
+      scale = Math.min(scale + 0.1, 5);
       updateZoom();
     }
     
     function zoomOut() {
-      scale = Math.max(scale - 0.25, 0.05);
+      scale = Math.max(scale - 0.1, 0.1);
       updateZoom();
     }
     
-    // Pinch zoom - detect 2 fingers globally, activate overlay
+    // Pinch to zoom - overlay always active
     let touching = false;
+    let lastDistance = null;
     
-    // Detect 2-finger touch at document level (before it reaches iframe)
-    document.addEventListener('touchstart', function(e) {
-      if (e.touches.length === 2) {
-        // Activate overlay immediately
-        touching = true;
-        overlay.classList.add('active');
-        initialDistance = getDistance(e.touches[0], e.touches[1]);
-        lastScale = scale;
-        e.preventDefault();
-      } else if (e.touches.length === 1) {
-        // Keep overlay inactive for 1-finger scroll
-        overlay.classList.remove('active');
-      }
-    }, { passive: false, capture: true });
-    
-    // Also catch touchstart on overlay itself
     overlay.addEventListener('touchstart', function(e) {
       if (e.touches.length === 2) {
+        // Two fingers - zoom mode
         e.preventDefault();
         e.stopPropagation();
         touching = true;
-        initialDistance = getDistance(e.touches[0], e.touches[1]);
-        lastScale = scale;
+        lastDistance = getDistance(e.touches[0], e.touches[1]);
+      } else if (e.touches.length === 1) {
+        // One finger - pass through to iframe by temporarily hiding overlay
+        overlay.style.pointerEvents = 'none';
+        
+        // Forward the touch to iframe
+        setTimeout(() => {
+          overlay.style.pointerEvents = 'auto';
+        }, 10);
       }
     }, { passive: false });
     
-    // Handle zoom on overlay when active
     overlay.addEventListener('touchmove', function(e) {
       if (e.touches.length === 2) {
-        if (!touching) {
-          // Started with 1 finger, added second during move
-          touching = true;
-          initialDistance = getDistance(e.touches[0], e.touches[1]);
-          lastScale = scale;
-        }
         e.preventDefault();
         e.stopPropagation();
+        
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
-        const newScale = lastScale * (currentDistance / initialDistance);
-        scale = Math.min(Math.max(0.05, newScale), 5);
-        updateZoom();
+        
+        if (lastDistance) {
+          // Mesafe farkına göre scale'i artır/azalt
+          const delta = currentDistance - lastDistance;
+          const sensitivity = 0.005; // Hassasiyet ayarı
+          
+          if (delta > 0) {
+            // Parmaklar açılıyor - BÜYÜT
+            scale = Math.min(scale + (delta * sensitivity), 5);
+          } else if (delta < 0) {
+            // Parmaklar kapanıyor - KÜÇÜLT
+            scale = Math.max(scale + (delta * sensitivity), 0.1);
+          }
+          
+          updateZoom();
+        }
+        
+        lastDistance = currentDistance;
       }
     }, { passive: false });
     
-    // Deactivate overlay when touch ends
-    document.addEventListener('touchend', function(e) {
+    overlay.addEventListener('touchend', function(e) {
       if (e.touches.length < 2) {
         touching = false;
-        overlay.classList.remove('active');
+        lastDistance = null;
       }
-    }, { passive: false, capture: true });
+    }, { passive: false });
     
     // Prevent default pinch zoom on document
     document.addEventListener('gesturestart', function(e) {
