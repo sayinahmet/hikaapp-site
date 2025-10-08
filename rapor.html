@@ -159,7 +159,7 @@
         right: 0;
         bottom: 0;
         z-index: 9999;
-        pointer-events: none; /* varsayılan: scroll için iframe'e geçsin */
+        pointer-events: auto; /* varsayılan: pinch her yerde yakalansın */
         background: transparent;
         touch-action: none; /* tarayıcı pinch/zoom devre dışı */
       }
@@ -307,7 +307,8 @@
       } else if (e.touches.length === 1) {
         // 1 parmak başlangıç: scroll'a izin vermek için anlık pass-through
         overlay.classList.remove('active');
-        overlay.style.pointerEvents = 'none';
+        // Tek parmakta bile pinch’e hızlı geçişe izin vermek için overlay açık kalsın
+        overlay.style.pointerEvents = 'auto';
         iframe.style.pointerEvents = 'auto';
         singleTouch = true;
         // Not: pointerEvents 'none' olarak kalır, 2. parmakta tekrar 'auto' yapılır
