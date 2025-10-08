@@ -311,6 +311,8 @@
         overlay.style.pointerEvents = 'auto';
         iframe.style.pointerEvents = 'auto';
         singleTouch = true;
+        // Bir sonraki pinch için mesafeyi sıfırla (yeni referans kurulsun)
+        initialDistance = 0;
         // Not: pointerEvents 'none' olarak kalır, 2. parmakta tekrar 'auto' yapılır
       }
     }, { passive: false, capture: true });
