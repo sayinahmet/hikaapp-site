@@ -159,18 +159,12 @@
         right: 0;
         bottom: 0;
         z-index: 9999;
-        pointer-events: auto;
+        pointer-events: none; /* default kapalı - 1 parmak scroll için */
         background: transparent;
-        touch-action: none;
+        touch-action: none; /* tarayıcı pinch/zoom devre dışı */
       }
       
-      .touch-overlay.active {
-        pointer-events: auto;
-      }
-      
-      .touch-overlay.active {
-        pointer-events: auto;
-      }
+      .touch-overlay.active { pointer-events: auto; }
       
       @media (max-width: 768px) {
         .touch-overlay {
@@ -292,41 +286,49 @@
       updateZoom();
     }
     
-    // Basit: 2 parmakta overlay aktif, 1 parmakta pasif
-    let lastDistance = null;
+    // PÜRÜZSÜZ PINCH: belge seviyesinde yakala, iframe'i pinch sırasında kapat
+    let rafId = null;
     
-    overlay.addEventListener('touchstart', function(e) {
+    function applyZoomSmooth() {
+      rafId = null;
+      updateZoom();
+    }
+    
+    document.addEventListener('touchstart', function(e) {
       if (e.touches.length === 2) {
-        lastDistance = getDistance(e.touches[0], e.touches[1]);
+        // Pinch başlıyor → overlay aktif, iframe pasif
+        overlay.classList.add('active');
+        iframe.style.pointerEvents = 'none';
+        initialDistance = getDistance(e.touches[0], e.touches[1]);
+        lastScale = scale;
         e.preventDefault();
-        e.stopPropagation();
       } else if (e.touches.length === 1) {
-        // 1 parmak: touch'u iframe'e geçir
-        overlay.style.pointerEvents = 'none';
-        requestAnimationFrame(() => {
-          overlay.style.pointerEvents = 'auto';
-        });
+        // 1 parmak → overlay pasif, iframe scroll aktif
+        overlay.classList.remove('active');
+        iframe.style.pointerEvents = 'auto';
       }
-    }, { passive: false });
+    }, { passive: false, capture: true });
     
-    overlay.addEventListener('touchmove', function(e) {
-      if (e.touches.length === 2 && lastDistance) {
+    document.addEventListener('touchmove', function(e) {
+      if (e.touches.length === 2 && initialDistance > 0) {
         e.preventDefault();
         e.stopPropagation();
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
-        const delta = currentDistance - lastDistance;
-        const sensitivity = 0.005;
-        scale = Math.max(0.1, Math.min(5, scale + (delta * sensitivity)));
-        updateZoom();
-        lastDistance = currentDistance;
+        const ratio = currentDistance / initialDistance; // oran tabanlı daha akıcı
+        scale = Math.max(0.1, Math.min(5, lastScale * ratio));
+        if (!rafId) rafId = requestAnimationFrame(applyZoomSmooth);
       }
-    }, { passive: false });
+    }, { passive: false, capture: true });
     
-    overlay.addEventListener('touchend', function(e) {
+    document.addEventListener('touchend', function(e) {
       if (e.touches.length < 2) {
-        lastDistance = null;
+        // Pinch bitti → overlay kapat, iframe scroll aç
+        overlay.classList.remove('active');
+        iframe.style.pointerEvents = 'auto';
+        initialDistance = 0;
+        lastScale = scale;
       }
-    }, { passive: false });
+    }, { passive: false, capture: true });
     
     // Prevent default pinch zoom on document
     document.addEventListener('gesturestart', function(e) {
