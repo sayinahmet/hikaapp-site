@@ -149,7 +149,7 @@
       height: 100%;
       border: none;
       display: block;
-      pointer-events: none;
+      pointer-events: auto;
     }
     
       .touch-overlay {
@@ -294,13 +294,15 @@
     // Detect 2 fingers at document level
     document.addEventListener('touchstart', function(e) {
       if (e.touches.length === 2) {
-        // Two fingers - activate overlay
+        // Two fingers - activate overlay, disable iframe
         overlay.classList.add('active');
+        iframe.style.pointerEvents = 'none';
         lastDistance = getDistance(e.touches[0], e.touches[1]);
         e.preventDefault();
       } else {
-        // One finger - keep overlay inactive for scroll
+        // One finger - keep overlay inactive, enable iframe scroll
         overlay.classList.remove('active');
+        iframe.style.pointerEvents = 'auto';
       }
     }, { passive: false, capture: true });
     
@@ -325,6 +327,7 @@
       if (e.touches.length < 2) {
         lastDistance = null;
         overlay.classList.remove('active');
+        iframe.style.pointerEvents = 'auto';
       }
     }, { passive: false, capture: true });
     
