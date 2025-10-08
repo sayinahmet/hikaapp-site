@@ -264,9 +264,9 @@
     const zoomLevelDisplay = document.getElementById('zoomLevel');
     
     function updateZoom() {
-      // Container scroll'u korumak için wrapper sabit boyutta kalsın
-      wrapper.style.width = '100%';
-      wrapper.style.height = '100%';
+      // Küçültmede kutu etkisini önlemek için alanı ters oranda büyüt
+      wrapper.style.width = `${100 / scale}%`;
+      wrapper.style.height = `${100 / scale}%`;
       wrapper.style.transformOrigin = '0 0';
       wrapper.style.transform = `scale(${scale})`;
 
