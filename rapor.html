@@ -313,6 +313,8 @@
     let lastTouchY = 0;
     let pinchCenterX = 0;
     let pinchCenterY = 0;
+    let pinchStartScrollLeft = 0;
+    let pinchStartScrollTop = 0;
 
     // Overlay üzerinde touch eventleri
     overlay.addEventListener('touchstart', function (e) {
@@ -326,6 +328,10 @@
         // Pinch merkez noktasını hesapla (viewport koordinatlarında)
         pinchCenterX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
         pinchCenterY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+
+        // Başlangıç scroll pozisyonunu kaydet
+        pinchStartScrollLeft = container.scrollLeft;
+        pinchStartScrollTop = container.scrollTop;
 
         e.preventDefault();
         e.stopPropagation();
@@ -352,21 +358,17 @@
         e.stopPropagation();
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
         if (initialDistance > 0) {
-          // Mevcut scroll pozisyonunu kaydet
-          const oldScrollLeft = container.scrollLeft;
-          const oldScrollTop = container.scrollTop;
+          const ratio = currentDistance / initialDistance;
+          const newScale = Math.max(0.1, Math.min(5, lastScale * ratio));
 
           // Pinch noktasının container içindeki pozisyonu
           const containerRect = container.getBoundingClientRect();
           const offsetX = pinchCenterX - containerRect.left;
           const offsetY = pinchCenterY - containerRect.top;
 
-          // Pinch noktasının içerikteki gerçek pozisyonu (scale öncesi)
-          const contentX = (oldScrollLeft + offsetX) / lastScale;
-          const contentY = (oldScrollTop + offsetY) / lastScale;
-
-          const ratio = currentDistance / initialDistance;
-          const newScale = Math.max(0.1, Math.min(5, lastScale * ratio));
+          // Pinch başlangıcındaki içerik noktası
+          const contentX = (pinchStartScrollLeft + offsetX) / lastScale;
+          const contentY = (pinchStartScrollTop + offsetY) / lastScale;
 
           scale = newScale;
 
