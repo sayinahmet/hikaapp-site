@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=0.1, maximum-scale=5.0" />
   <title>Raporlar – Hi‑Ka Araç Yönetimi</title>
   <link rel="icon" href="./assets/logo-120.png" type="image/png">
   <style>
@@ -32,7 +32,6 @@
       right: 0;
       z-index: 1000;
       height: 60px;
-      pointer-events: auto; /* her zaman tıklanabilir */
     }
     
     .brand {
@@ -75,7 +74,6 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      pointer-events: auto; /* her zaman tıklanabilir */
     }
     
     .zoom-btn {
@@ -137,25 +135,22 @@
       background: #fff;
       overflow: auto;
       -webkit-overflow-scrolling: touch;
-      touch-action: pan-x pan-y; /* scroll'a izin ver ama pinch'i JS'e bırak */
     }
     
-      .doc-wrapper {
-        width: 100%;
-        height: 100%;
-        transform-origin: 0 0;
-        position: relative;
-        pointer-events: auto; /* touch'ları yakala */
-        touch-action: none; /* tarayıcı müdahalesini engelle, JS yönetsin */
-      }
+    .doc-wrapper {
+      width: 100%;
+      height: 100%;
+      transform-origin: 0 0;
+      transition: transform 0.1s ease-out;
+    }
     
-      .doc-frame {
-        width: 100%;
-        height: 100%;
-        border: none;
-        display: block;
-        pointer-events: auto;
-      }
+    .doc-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      pointer-events: auto;
+    }
     
     /* Loading */
     .loading {
@@ -227,7 +222,6 @@
     <div class="doc-wrapper" id="wrapper">
       <iframe 
         class="doc-frame"
-        id="iframe"
         src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTcqImwmoqI14CTwD5adZzRUworW9fMkwFoeSRykMvsdE4YWlo0uhm_mCtadhktzESwoOJKe2MmcrnP/pubhtml?gid=1490004875&single=true&rm=minimal&widget=false"
         allow="fullscreen"
         loading="eager"
@@ -243,16 +237,12 @@
     
     const wrapper = document.getElementById('wrapper');
     const container = document.getElementById('container');
-    const iframe = document.getElementById('iframe');
     const zoomLevelDisplay = document.getElementById('zoomLevel');
     
     function updateZoom() {
-      // Küçültmede kutu etkisini önlemek için alanı ters oranda büyüt
+      wrapper.style.transform = `scale(${scale})`;
       wrapper.style.width = `${100 / scale}%`;
       wrapper.style.height = `${100 / scale}%`;
-      wrapper.style.transformOrigin = '0 0';
-      wrapper.style.transform = `scale(${scale})`;
-
       zoomLevelDisplay.textContent = Math.round(scale * 100) + '%';
     }
     
@@ -267,94 +257,32 @@
       updateZoom();
     }
     
-    // PINCH VE SCROLL: wrapper tüm touch'ları yakala, biz yönetelim
-    let rafId = null;
-    let isPinching = false;
-    let lastTouchY = 0;
-    let lastTouchX = 0;
+    // Pinch to zoom
+    let touching = false;
     
-    function applyZoomSmooth() {
-      rafId = null;
-      updateZoom();
-    }
-
-    // Wrapper'dan tüm touch'ları yakala
-    wrapper.addEventListener('touchstart', function(e) {
+    container.addEventListener('touchstart', function(e) {
       if (e.touches.length === 2) {
-        // İki parmak - pinch başlıyor
-        isPinching = true;
+        touching = true;
+        e.preventDefault();
         initialDistance = getDistance(e.touches[0], e.touches[1]);
         lastScale = scale;
-        e.preventDefault();
-      } else if (e.touches.length === 1) {
-        // Tek parmak - scroll için hazırlan
-        isPinching = false;
-        lastTouchY = e.touches[0].clientY;
-        lastTouchX = e.touches[0].clientX;
-        initialDistance = 0;
       }
     }, { passive: false });
     
-    wrapper.addEventListener('touchmove', function(e) {
-      if (e.touches.length === 2) {
-        // İki parmak - pinch zoom
-        if (!isPinching || initialDistance === 0) {
-          // Yeni pinch başlatılıyor
-          isPinching = true;
-          initialDistance = getDistance(e.touches[0], e.touches[1]);
-          lastScale = scale;
-        }
-        
+    container.addEventListener('touchmove', function(e) {
+      if (e.touches.length === 2 && touching) {
         e.preventDefault();
-        e.stopPropagation();
-        
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
-        const ratio = currentDistance / initialDistance;
-        scale = Math.max(0.1, Math.min(5, lastScale * ratio));
-        
-        if (!rafId) {
-          rafId = requestAnimationFrame(applyZoomSmooth);
-        }
-      } else if (e.touches.length === 1 && !isPinching) {
-        // Tek parmak - manuel scroll (container scroll)
-        const deltaY = lastTouchY - e.touches[0].clientY;
-        const deltaX = lastTouchX - e.touches[0].clientX;
-        
-        container.scrollTop += deltaY;
-        container.scrollLeft += deltaX;
-        
-        lastTouchY = e.touches[0].clientY;
-        lastTouchX = e.touches[0].clientX;
-        
-        e.preventDefault();
+        scale = lastScale * (currentDistance / initialDistance);
+        scale = Math.min(Math.max(0.1, scale), 5);
+        updateZoom();
       }
     }, { passive: false });
     
-    wrapper.addEventListener('touchend', function(e) {
-      if (e.touches.length === 0) {
-        // Tüm parmaklar kalktı
-        isPinching = false;
-        initialDistance = 0;
-        lastScale = scale;
-      } else if (e.touches.length === 1) {
-        // İki parmaktan bire düştü - scroll için hazırlan
-        isPinching = false;
-        lastTouchY = e.touches[0].clientY;
-        lastTouchX = e.touches[0].clientX;
+    container.addEventListener('touchend', function(e) {
+      if (e.touches.length < 2) {
+        touching = false;
       }
-    }, { passive: false });
-    
-    // Prevent default pinch zoom on document
-    document.addEventListener('gesturestart', function(e) {
-      e.preventDefault();
-    });
-    
-    document.addEventListener('gesturechange', function(e) {
-      e.preventDefault();
-    });
-    
-    document.addEventListener('gestureend', function(e) {
-      e.preventDefault();
     });
     
     function getDistance(touch1, touch2) {
@@ -363,7 +291,7 @@
       return Math.sqrt(dx * dx + dy * dy);
     }
     
-    // Prevent default zoom on double tap (CSS touch-action: manipulation da yardımcı olur)
+    // Prevent default zoom on double tap
     let lastTouchEnd = 0;
     document.addEventListener('touchend', function(e) {
       const now = Date.now();
@@ -371,7 +299,7 @@
         e.preventDefault();
       }
       lastTouchEnd = now;
-    }, { passive: false });
+    }, false);
   </script>
 </body>
 </html>
