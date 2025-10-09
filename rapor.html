@@ -311,6 +311,8 @@
     let isPanning = false;
     let lastTouchX = 0;
     let lastTouchY = 0;
+    let pinchCenterX = 0;
+    let pinchCenterY = 0;
 
     // Overlay üzerinde touch eventleri
     overlay.addEventListener('touchstart', function (e) {
@@ -320,6 +322,11 @@
         isPanning = false;
         initialDistance = getDistance(e.touches[0], e.touches[1]);
         lastScale = scale;
+
+        // Pinch merkez noktasını hesapla (viewport koordinatlarında)
+        pinchCenterX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        pinchCenterY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+
         e.preventDefault();
         e.stopPropagation();
       } else if (e.touches.length === 1) {
@@ -338,14 +345,33 @@
         if (initialDistance === 0) {
           initialDistance = getDistance(e.touches[0], e.touches[1]);
           lastScale = scale;
+          pinchCenterX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+          pinchCenterY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
         }
         e.preventDefault();
         e.stopPropagation();
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
         if (initialDistance > 0) {
+          // Zoom öncesi pinch noktasının içerikteki konumu
+          const containerRect = container.getBoundingClientRect();
+          const pointX = (pinchCenterX - containerRect.left + container.scrollLeft) / lastScale;
+          const pointY = (pinchCenterY - containerRect.top + container.scrollTop) / lastScale;
+
           const ratio = currentDistance / initialDistance;
-          scale = Math.max(0.1, Math.min(5, lastScale * ratio));
-          if (!rafId) rafId = requestAnimationFrame(applyZoomSmooth);
+          const newScale = Math.max(0.1, Math.min(5, lastScale * ratio));
+
+          // Yeni scale'de aynı noktanın konumu
+          const newScrollLeft = pointX * newScale - (pinchCenterX - containerRect.left);
+          const newScrollTop = pointY * newScale - (pinchCenterY - containerRect.top);
+
+          scale = newScale;
+          if (!rafId) {
+            rafId = requestAnimationFrame(() => {
+              applyZoomSmooth();
+              container.scrollLeft = newScrollLeft;
+              container.scrollTop = newScrollTop;
+            });
+          }
         }
       } else if (e.touches.length === 1 && isPanning) {
         // 1 parmak pan/scroll
