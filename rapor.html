@@ -133,16 +133,16 @@
       right: 0;
       bottom: 0;
       background: #fff;
-      overflow: auto;
+      overflow: auto; /* pan için container scroll kullanılacak */
       -webkit-overflow-scrolling: touch;
     }
     
-    .doc-wrapper {
-      width: 100%;
-      height: 100%;
-      transform-origin: 0 0;
-      transition: transform 0.1s ease-out;
-    }
+      .doc-wrapper {
+        width: 100%;
+        height: 100%;
+        transform-origin: 0 0;
+        position: relative;
+      }
     
     .doc-frame {
       width: 100%;
@@ -151,6 +151,25 @@
       display: block;
       pointer-events: auto;
     }
+    
+      .touch-overlay {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 9999;
+        pointer-events: auto; /* default: pinch her yerde yakalansın */
+        background: transparent;
+        touch-action: none; /* tarayıcı pinch/zoom devre dışı */
+      }
+      .touch-overlay.active { pointer-events: auto; }
+      
+      @media (max-width: 768px) {
+        .touch-overlay {
+          top: 56px;
+        }
+      }
     
     /* Loading */
     .loading {
@@ -217,11 +236,14 @@
     <div class="zoom-btn" onclick="zoomOut()">−</div>
   </div>
 
+  <div class="touch-overlay" id="overlay"></div>
+
   <div class="doc-container" id="container">
     <div class="loading">Rapor yükleniyor</div>
     <div class="doc-wrapper" id="wrapper">
       <iframe 
         class="doc-frame"
+        id="iframe"
         src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTcqImwmoqI14CTwD5adZzRUworW9fMkwFoeSRykMvsdE4YWlo0uhm_mCtadhktzESwoOJKe2MmcrnP/pubhtml?gid=1490004875&single=true&rm=minimal&widget=false"
         allow="fullscreen"
         loading="eager"
@@ -237,12 +259,17 @@
     
     const wrapper = document.getElementById('wrapper');
     const container = document.getElementById('container');
+    const overlay = document.getElementById('overlay');
+    const iframe = document.getElementById('iframe');
     const zoomLevelDisplay = document.getElementById('zoomLevel');
     
     function updateZoom() {
-      wrapper.style.transform = `scale(${scale})`;
+      // Küçültmede kutu etkisini önlemek için alanı ters oranda büyüt
       wrapper.style.width = `${100 / scale}%`;
       wrapper.style.height = `${100 / scale}%`;
+      wrapper.style.transformOrigin = '0 0';
+      wrapper.style.transform = `scale(${scale})`;
+
       zoomLevelDisplay.textContent = Math.round(scale * 100) + '%';
     }
     
@@ -257,32 +284,86 @@
       updateZoom();
     }
     
-    // Pinch to zoom
-    let touching = false;
+    // PÜRÜZSÜZ PINCH: belge seviyesinde yakala, iframe'i pinch sırasında kapat
+    let rafId = null;
     
-    container.addEventListener('touchstart', function(e) {
+    function applyZoomSmooth() {
+      rafId = null;
+      updateZoom();
+    }
+    
+    // Overlay tüm içerikte; 1 parmakta olay iframe'e geçsin diye anlık kapat
+    let singleTouch = false;
+
+    document.addEventListener('touchstart', function(e) {
       if (e.touches.length === 2) {
-        touching = true;
-        e.preventDefault();
+        // Pinch başlıyor → overlay aktif, iframe pasif
+        overlay.classList.add('active');
+        overlay.style.pointerEvents = 'auto';
+        iframe.style.pointerEvents = 'none';
         initialDistance = getDistance(e.touches[0], e.touches[1]);
         lastScale = scale;
-      }
-    }, { passive: false });
-    
-    container.addEventListener('touchmove', function(e) {
-      if (e.touches.length === 2 && touching) {
         e.preventDefault();
-        const currentDistance = getDistance(e.touches[0], e.touches[1]);
-        scale = lastScale * (currentDistance / initialDistance);
-        scale = Math.min(Math.max(0.1, scale), 5);
-        updateZoom();
+      } else if (e.touches.length === 1) {
+        // 1 parmak başlangıç: scroll'a izin vermek için anlık pass-through
+        overlay.classList.remove('active');
+        // Tek parmakta overlay kapalı kalsın; ikinci parmakta açılacak
+        overlay.style.pointerEvents = 'none';
+        iframe.style.pointerEvents = 'auto';
+        singleTouch = true;
+        // Bir sonraki pinch için mesafeyi sıfırla (yeni referans kurulsun)
+        initialDistance = 0;
+        // Not: pointerEvents 'none' olarak kalır, 2. parmakta tekrar 'auto' yapılır
       }
-    }, { passive: false });
+    }, { passive: false, capture: true });
     
-    container.addEventListener('touchend', function(e) {
-      if (e.touches.length < 2) {
-        touching = false;
+    document.addEventListener('touchmove', function(e) {
+      if (e.touches.length === 2) {
+        // Eğer 1 parmakla başladı ve ikinci parmak eklendiyse burada başlat
+        if (initialDistance === 0) {
+          overlay.classList.add('active');
+          overlay.style.pointerEvents = 'auto';
+          iframe.style.pointerEvents = 'none';
+          singleTouch = false;
+          initialDistance = getDistance(e.touches[0], e.touches[1]);
+          lastScale = scale;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        const currentDistance = getDistance(e.touches[0], e.touches[1]);
+        const ratio = currentDistance / initialDistance; // oran tabanlı daha akıcı
+        scale = Math.max(0.1, Math.min(5, lastScale * ratio));
+        if (!rafId) rafId = requestAnimationFrame(applyZoomSmooth);
       }
+    }, { passive: false, capture: true });
+    
+    document.addEventListener('touchend', function(e) {
+      if (e.touches.length < 2) {
+        // Pinch bitti → overlay pasif, iframe scroll aç
+        overlay.classList.remove('active');
+        overlay.style.pointerEvents = 'none';
+        iframe.style.pointerEvents = 'auto';
+        initialDistance = 0;
+        lastScale = scale;
+        // Tek dokunuş bitti → overlay yine kapalı kalsın; yeni pinch'te 2. parmakta açılacak
+        if (singleTouch && e.touches.length === 0) {
+          overlay.style.pointerEvents = 'none';
+          singleTouch = false;
+        }
+      }
+    }, { passive: false, capture: true });
+    
+    // Prevent default pinch zoom on document
+    document.addEventListener('gesturestart', function(e) {
+      e.preventDefault();
+    });
+    
+    document.addEventListener('gesturechange', function(e) {
+      e.preventDefault();
+    });
+    
+    document.addEventListener('gestureend', function(e) {
+      e.preventDefault();
     });
     
     function getDistance(touch1, touch2) {
