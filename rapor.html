@@ -314,41 +314,35 @@
       updateZoom();
     }
 
-    // Overlay tüm içerikte; 1 parmakta olay iframe'e geçsin diye anlık kapat
-    let singleTouch = false;
+    // Pinch durumu takibi
+    let isPinching = false;
 
     document.addEventListener('touchstart', function (e) {
       if (e.touches.length === 2) {
-        // Pinch başlıyor → overlay aktif, iframe pasif
-        overlay.classList.add('active');
+        // Pinch başlıyor
+        isPinching = true;
         overlay.style.pointerEvents = 'auto';
         iframe.style.pointerEvents = 'none';
-        singleTouch = false;
         // Her pinch başlangıcında yeni mesafe ve scale referansı al
         initialDistance = getDistance(e.touches[0], e.touches[1]);
         lastScale = scale;
         e.preventDefault();
       } else if (e.touches.length === 1) {
-        // 1 parmak başlangıç: scroll'a izin vermek için anlık pass-through
-        overlay.classList.remove('active');
-        // Tek parmakta overlay kapalı kalsın; ikinci parmakta açılacak
-        overlay.style.pointerEvents = 'none';
-        iframe.style.pointerEvents = 'auto';
-        singleTouch = true;
-        // Bir sonraki pinch için mesafeyi sıfırla (yeni referans kurulsun)
-        initialDistance = 0;
-        // Not: pointerEvents 'none' olarak kalır, 2. parmakta tekrar 'auto' yapılır
+        // 1 parmak: iframe'e scroll izni ver
+        if (!isPinching) {
+          overlay.style.pointerEvents = 'none';
+          iframe.style.pointerEvents = 'auto';
+        }
       }
     }, { passive: false, capture: true });
 
     document.addEventListener('touchmove', function (e) {
       if (e.touches.length === 2) {
         // Eğer 1 parmakla başladı ve ikinci parmak eklendiyse burada başlat
-        if (initialDistance === 0) {
-          overlay.classList.add('active');
+        if (!isPinching || initialDistance === 0) {
+          isPinching = true;
           overlay.style.pointerEvents = 'auto';
           iframe.style.pointerEvents = 'none';
-          singleTouch = false;
           initialDistance = getDistance(e.touches[0], e.touches[1]);
           lastScale = scale;
         }
@@ -356,7 +350,7 @@
         e.stopPropagation();
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
         if (initialDistance > 0) {
-          const ratio = currentDistance / initialDistance; // oran tabanlı daha akıcı
+          const ratio = currentDistance / initialDistance;
           scale = Math.max(0.1, Math.min(5, lastScale * ratio));
           if (!rafId) rafId = requestAnimationFrame(applyZoomSmooth);
         }
@@ -364,20 +358,21 @@
     }, { passive: false, capture: true });
 
     document.addEventListener('touchend', function (e) {
-      if (e.touches.length < 2) {
-        // Pinch bitti → overlay pasif, iframe scroll aç
-        overlay.classList.remove('active');
+      // Tüm parmaklar kalktığında pinch'i bitir
+      if (e.touches.length === 0) {
+        isPinching = false;
+        initialDistance = 0;
+        lastScale = scale;
+        // Overlay'i tekrar aktif yap (bir sonraki pinch için hazır)
+        overlay.style.pointerEvents = 'auto';
+        iframe.style.pointerEvents = 'auto';
+      } else if (e.touches.length === 1 && isPinching) {
+        // Pinch sırasında bir parmak kalktı, diğeri hala var
+        isPinching = false;
+        initialDistance = 0;
+        lastScale = scale;
         overlay.style.pointerEvents = 'none';
         iframe.style.pointerEvents = 'auto';
-        // Mesafeyi sıfırla, bir sonraki pinch için hazır ol
-        initialDistance = 0;
-        // Mevcut scale'i kaydet
-        lastScale = scale;
-        // Tek dokunuş bitti → önce scroll'a izin ver, bir frame sonra overlay'i aç
-        if (singleTouch && e.touches.length === 0) {
-          requestAnimationFrame(() => { overlay.style.pointerEvents = 'auto'; });
-          singleTouch = false;
-        }
       }
     }, { passive: false, capture: true });
 
@@ -408,7 +403,7 @@
         e.preventDefault();
       }
       lastTouchEnd = now;
-    }, false);
+    }, { passive: false });
   </script>
 </body>
 
