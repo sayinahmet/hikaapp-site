@@ -32,6 +32,7 @@
       right: 0;
       z-index: 1000;
       height: 60px;
+      pointer-events: auto; /* her zaman tıklanabilir */
     }
     
     .brand {
@@ -74,6 +75,7 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+      pointer-events: auto; /* her zaman tıklanabilir */
     }
     
     .zoom-btn {
@@ -156,23 +158,17 @@
     
       .touch-overlay {
         position: fixed;
-        top: 60px;
+        top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        z-index: 9999;
+        z-index: 500; /* header (1000) ve zoom butonları (1001) altında */
         pointer-events: auto; /* varsayılan olarak aktif - tüm touch'ları yakala */
         background: transparent;
         touch-action: none; /* tarayıcı pinch/zoom müdahalesini engelle */
       }
       .touch-overlay.scrolling { 
         pointer-events: none; /* sadece scroll sırasında iframe'e geçir */
-      }
-      
-      @media (max-width: 768px) {
-        .touch-overlay {
-          top: 56px;
-        }
       }
     
     /* Loading */
@@ -288,7 +284,7 @@
       updateZoom();
     }
     
-    // PÜRÜZSÜZ PINCH: document seviyesinde yakala, her yerde çalışsın
+    // PÜRÜZSÜZ PINCH: overlay tüm ekranı kaplıyor, touch'ları buradan yakala
     let rafId = null;
     let isPinching = false;
     
@@ -297,8 +293,8 @@
       updateZoom();
     }
 
-    // Document seviyesinde tüm touch'ları yakala (iframe içinde de çalışır)
-    document.addEventListener('touchstart', function(e) {
+    // Overlay'den tüm touch'ları yakala
+    overlay.addEventListener('touchstart', function(e) {
       if (e.touches.length === 2) {
         // İki parmak - pinch başlıyor
         isPinching = true;
@@ -314,9 +310,9 @@
         overlay.classList.add('scrolling');
         // iframe için pointer events zaten auto
       }
-    }, { passive: false, capture: true });
+    }, { passive: false });
     
-    document.addEventListener('touchmove', function(e) {
+    overlay.addEventListener('touchmove', function(e) {
       if (e.touches.length === 2) {
         // İki parmak tespit edildi
         if (!isPinching || initialDistance === 0) {
@@ -339,9 +335,9 @@
           rafId = requestAnimationFrame(applyZoomSmooth);
         }
       }
-    }, { passive: false, capture: true });
+    }, { passive: false });
     
-    document.addEventListener('touchend', function(e) {
+    overlay.addEventListener('touchend', function(e) {
       if (e.touches.length === 0) {
         // Tüm parmaklar kalktı - varsayılan duruma dön
         isPinching = false;
@@ -353,7 +349,7 @@
         isPinching = false;
         overlay.classList.add('scrolling');
       }
-    }, { passive: false, capture: true });
+    }, { passive: false });
     
     // Prevent default pinch zoom on document
     document.addEventListener('gesturestart', function(e) {
