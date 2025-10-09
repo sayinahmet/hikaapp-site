@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=0.1, maximum-scale=5.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0" />
   <title>Raporlar – Hi‑Ka Araç Yönetimi</title>
   <link rel="icon" href="./assets/logo-120.png" type="image/png">
   <style>
@@ -133,8 +133,9 @@
       right: 0;
       bottom: 0;
       background: #fff;
-      overflow: auto; /* pan için container scroll kullanılacak */
+      overflow: auto;
       -webkit-overflow-scrolling: touch;
+      touch-action: pan-x pan-y; /* scroll'a izin ver ama pinch'i JS'e bırak */
     }
     
       .doc-wrapper {
@@ -150,6 +151,7 @@
       border: none;
       display: block;
       pointer-events: auto;
+      touch-action: pan-x pan-y; /* iframe içinde de scroll'a izin ver */
     }
     
       .touch-overlay {
@@ -159,11 +161,13 @@
         right: 0;
         bottom: 0;
         z-index: 9999;
-        pointer-events: none; /* varsayılan: scroll serbest; 2 parmakta JS ile açıyoruz */
+        pointer-events: none; /* varsayılan olarak kapalı */
         background: transparent;
-        touch-action: none; /* tarayıcı pinch/zoom devre dışı */
+        touch-action: none; /* pinch sırasında aktif olduğunda tarayıcı müdahalesini engelle */
       }
-      .touch-overlay.active { pointer-events: auto; }
+      .touch-overlay.pinching { 
+        pointer-events: auto; /* sadece pinch sırasında aktif */
+      }
       
       @media (max-width: 768px) {
         .touch-overlay {
@@ -286,70 +290,64 @@
     
     // PÜRÜZSÜZ PINCH: belge seviyesinde yakala, iframe'i pinch sırasında kapat
     let rafId = null;
+    let isPinching = false;
     
     function applyZoomSmooth() {
       rafId = null;
       updateZoom();
     }
-    
-    // Overlay tüm içerikte; 1 parmakta olay iframe'e geçsin diye anlık kapat
-    let singleTouch = false;
 
     document.addEventListener('touchstart', function(e) {
       if (e.touches.length === 2) {
-        // Pinch başlıyor → overlay aktif, iframe pasif
-        overlay.classList.add('active');
-        overlay.style.pointerEvents = 'auto';
+        // İki parmak tespit edildi - pinch başlıyor
+        isPinching = true;
+        overlay.classList.add('pinching');
         iframe.style.pointerEvents = 'none';
         initialDistance = getDistance(e.touches[0], e.touches[1]);
         lastScale = scale;
         e.preventDefault();
       } else if (e.touches.length === 1) {
-        // 1 parmak başlangıç: scroll'a izin vermek için anlık pass-through
-        overlay.classList.remove('active');
-        // Tek parmakta overlay kapalı kalsın; ikinci parmakta açılacak
-        overlay.style.pointerEvents = 'none';
+        // Tek parmak - scroll için iframe aktif kalacak
+        isPinching = false;
+        overlay.classList.remove('pinching');
         iframe.style.pointerEvents = 'auto';
-        singleTouch = true;
-        // Bir sonraki pinch için mesafeyi sıfırla (yeni referans kurulsun)
         initialDistance = 0;
-        // Not: pointerEvents 'none' olarak kalır, 2. parmakta tekrar 'auto' yapılır
       }
     }, { passive: false, capture: true });
     
     document.addEventListener('touchmove', function(e) {
       if (e.touches.length === 2) {
-        // Eğer 1 parmakla başladı ve ikinci parmak eklendiyse burada başlat
-        if (initialDistance === 0) {
-          overlay.classList.add('active');
-          overlay.style.pointerEvents = 'auto';
+        // İki parmak tespit edildi
+        if (!isPinching || initialDistance === 0) {
+          // Yeni pinch başlatılıyor
+          isPinching = true;
+          overlay.classList.add('pinching');
           iframe.style.pointerEvents = 'none';
-          singleTouch = false;
           initialDistance = getDistance(e.touches[0], e.touches[1]);
           lastScale = scale;
         }
+        
         e.preventDefault();
         e.stopPropagation();
+        
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
-        const ratio = currentDistance / initialDistance; // oran tabanlı daha akıcı
+        const ratio = currentDistance / initialDistance;
         scale = Math.max(0.1, Math.min(5, lastScale * ratio));
-        if (!rafId) rafId = requestAnimationFrame(applyZoomSmooth);
+        
+        if (!rafId) {
+          rafId = requestAnimationFrame(applyZoomSmooth);
+        }
       }
     }, { passive: false, capture: true });
     
     document.addEventListener('touchend', function(e) {
       if (e.touches.length < 2) {
-        // Pinch bitti → overlay pasif, iframe scroll aç
-        overlay.classList.remove('active');
-        overlay.style.pointerEvents = 'none';
+        // Artık iki parmak yok - pinch bitti
+        isPinching = false;
+        overlay.classList.remove('pinching');
         iframe.style.pointerEvents = 'auto';
         initialDistance = 0;
         lastScale = scale;
-        // Tek dokunuş bitti → önce scroll'a izin ver, bir frame sonra overlay'i aç
-        if (singleTouch && e.touches.length === 0) {
-          requestAnimationFrame(() => { overlay.style.pointerEvents = 'auto'; });
-          singleTouch = false;
-        }
       }
     }, { passive: false, capture: true });
     
@@ -372,7 +370,7 @@
       return Math.sqrt(dx * dx + dy * dy);
     }
     
-    // Prevent default zoom on double tap
+    // Prevent default zoom on double tap (CSS touch-action: manipulation da yardımcı olur)
     let lastTouchEnd = 0;
     document.addEventListener('touchend', function(e) {
       const now = Date.now();
@@ -380,7 +378,7 @@
         e.preventDefault();
       }
       lastTouchEnd = now;
-    }, false);
+    }, { passive: false });
   </script>
 </body>
 </html>
