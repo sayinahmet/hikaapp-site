@@ -352,24 +352,30 @@
         e.stopPropagation();
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
         if (initialDistance > 0) {
-          // Zoom öncesi pinch noktasının içerikteki konumu
+          // Mevcut scroll pozisyonunu kaydet
+          const oldScrollLeft = container.scrollLeft;
+          const oldScrollTop = container.scrollTop;
+
+          // Pinch noktasının container içindeki pozisyonu
           const containerRect = container.getBoundingClientRect();
-          const pointX = (pinchCenterX - containerRect.left + container.scrollLeft) / lastScale;
-          const pointY = (pinchCenterY - containerRect.top + container.scrollTop) / lastScale;
+          const offsetX = pinchCenterX - containerRect.left;
+          const offsetY = pinchCenterY - containerRect.top;
+
+          // Pinch noktasının içerikteki gerçek pozisyonu (scale öncesi)
+          const contentX = (oldScrollLeft + offsetX) / lastScale;
+          const contentY = (oldScrollTop + offsetY) / lastScale;
 
           const ratio = currentDistance / initialDistance;
           const newScale = Math.max(0.1, Math.min(5, lastScale * ratio));
 
-          // Yeni scale'de aynı noktanın konumu
-          const newScrollLeft = pointX * newScale - (pinchCenterX - containerRect.left);
-          const newScrollTop = pointY * newScale - (pinchCenterY - containerRect.top);
-
           scale = newScale;
+
           if (!rafId) {
             rafId = requestAnimationFrame(() => {
               applyZoomSmooth();
-              container.scrollLeft = newScrollLeft;
-              container.scrollTop = newScrollTop;
+              // Yeni scale'de aynı içerik noktası aynı ekran pozisyonunda kalmalı
+              container.scrollLeft = contentX * newScale - offsetX;
+              container.scrollTop = contentY * newScale - offsetY;
             });
           }
         }
