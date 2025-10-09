@@ -148,16 +148,15 @@
     }
 
     .doc-wrapper {
-      min-width: 100%;
-      min-height: 100%;
+      width: 1200px;
+      height: 2000px;
       transform-origin: 0 0;
       position: relative;
-      display: inline-block;
     }
 
     .doc-frame {
-      width: 100%;
-      height: 100%;
+      width: 1200px;
+      height: 2000px;
       border: none;
       display: block;
       pointer-events: auto;
@@ -283,17 +282,8 @@
     const zoomLevelDisplay = document.getElementById('zoomLevel');
 
     function updateZoom() {
-      // Viewport boyutlarını al
-      const viewportWidth = container.clientWidth;
-      const viewportHeight = container.clientHeight;
-
-      // Wrapper'ı scale'e göre boyutlandır
-      // Küçültünce (scale < 1) daha büyük alan, büyütünce (scale > 1) daha küçük alan
-      wrapper.style.width = `${viewportWidth / scale}px`;
-      wrapper.style.height = `${viewportHeight / scale}px`;
-      wrapper.style.transformOrigin = '0 0';
+      // Sadece scale uygula, boyutlar sabit
       wrapper.style.transform = `scale(${scale})`;
-
       zoomLevelDisplay.textContent = Math.round(scale * 100) + '%';
     }
 
