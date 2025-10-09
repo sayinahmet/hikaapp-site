@@ -172,8 +172,8 @@
       pointer-events: auto;
       /* her zaman aktif: touch eventleri yakala */
       background: transparent;
-      touch-action: pan-x pan-y;
-      /* 1 parmak scroll'a izin ver, pinch'i engelle */
+      touch-action: none;
+      /* tüm touch'ları kendimiz yöneteceğiz */
     }
 
     @media (max-width: 768px) {
@@ -310,29 +310,36 @@
       updateZoom();
     }
 
-    // Pinch durumu takibi
+    // Pinch ve Pan durumu takibi
     let isPinching = false;
+    let isPanning = false;
+    let lastTouchX = 0;
+    let lastTouchY = 0;
 
     // Overlay üzerinde touch eventleri
     overlay.addEventListener('touchstart', function (e) {
       if (e.touches.length === 2) {
         // 2 parmak: pinch başlıyor
         isPinching = true;
+        isPanning = false;
         initialDistance = getDistance(e.touches[0], e.touches[1]);
         lastScale = scale;
         e.preventDefault();
         e.stopPropagation();
       } else if (e.touches.length === 1) {
-        // 1 parmak: iframe'e geçir (event'i durdurmayalım)
-        // Hiçbir şey yapma, event iframe'e geçecek
+        // 1 parmak: pan başlıyor
+        isPanning = true;
+        isPinching = false;
+        lastTouchX = e.touches[0].clientX;
+        lastTouchY = e.touches[0].clientY;
+        e.preventDefault();
       }
     }, { passive: false });
 
     overlay.addEventListener('touchmove', function (e) {
-      if (e.touches.length === 2) {
+      if (e.touches.length === 2 && isPinching) {
         // 2 parmak pinch
-        if (!isPinching || initialDistance === 0) {
-          isPinching = true;
+        if (initialDistance === 0) {
           initialDistance = getDistance(e.touches[0], e.touches[1]);
           lastScale = scale;
         }
@@ -344,8 +351,19 @@
           scale = Math.max(0.1, Math.min(5, lastScale * ratio));
           if (!rafId) rafId = requestAnimationFrame(applyZoomSmooth);
         }
+      } else if (e.touches.length === 1 && isPanning) {
+        // 1 parmak pan/scroll
+        e.preventDefault();
+        const deltaX = e.touches[0].clientX - lastTouchX;
+        const deltaY = e.touches[0].clientY - lastTouchY;
+
+        // Container'ı scroll et
+        container.scrollLeft -= deltaX;
+        container.scrollTop -= deltaY;
+
+        lastTouchX = e.touches[0].clientX;
+        lastTouchY = e.touches[0].clientY;
       }
-      // 1 parmak: hiçbir şey yapma, scroll çalışsın
     }, { passive: false });
 
     overlay.addEventListener('touchend', function (e) {
@@ -354,6 +372,10 @@
         isPinching = false;
         initialDistance = 0;
         lastScale = scale;
+      }
+      if (e.touches.length === 0) {
+        // Tüm parmaklar kalktı
+        isPanning = false;
       }
     }, { passive: false });
 
