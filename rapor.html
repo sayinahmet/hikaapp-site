@@ -148,10 +148,11 @@
     }
 
     .doc-wrapper {
-      width: 100%;
-      height: 100%;
+      min-width: 100%;
+      min-height: 100%;
       transform-origin: 0 0;
       position: relative;
+      display: inline-block;
     }
 
     .doc-frame {
@@ -282,9 +283,14 @@
     const zoomLevelDisplay = document.getElementById('zoomLevel');
 
     function updateZoom() {
-      // Küçültmede kutu etkisini önlemek için alanı ters oranda büyüt
-      wrapper.style.width = `${100 / scale}%`;
-      wrapper.style.height = `${100 / scale}%`;
+      // Viewport boyutlarını al
+      const viewportWidth = container.clientWidth;
+      const viewportHeight = container.clientHeight;
+
+      // Wrapper'ı scale'e göre boyutlandır
+      // Küçültünce (scale < 1) daha büyük alan, büyütünce (scale > 1) daha küçük alan
+      wrapper.style.width = `${viewportWidth / scale}px`;
+      wrapper.style.height = `${viewportHeight / scale}px`;
       wrapper.style.transformOrigin = '0 0';
       wrapper.style.transform = `scale(${scale})`;
 
