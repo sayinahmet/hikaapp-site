@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="tr">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=0.1, maximum-scale=5.0" />
+  <title>Raporlar – Hi‑Ka Araç Yönetimi</title>
+  <link rel="icon" href="./assets/logo-120.png" type="image/png">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: #1a1f28;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(180deg, rgba(20, 24, 32, .95), rgba(20, 24, 32, .92));
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, .1);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: 60px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .brand img {
+      width: 28px;
+      height: 28px;
+      margin-right: 10px;
+      border-radius: 6px;
+    }
+
+    .back-btn {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .1);
+      border: 1px solid rgba(255, 255, 255, .2);
+      color: #fff;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, .15);
+    }
+
+    /* Zoom Controls */
+    .zoom-controls {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .zoom-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(20, 24, 32, .95), rgba(20, 24, 32, .92));
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, .2);
+      color: #fff;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
+      transition: all 0.2s;
+      user-select: none;
+      line-height: 1;
+      padding: 0;
+    }
+
+    /* Desktop için daha iyi hizalama */
+    @media (min-width: 769px) {
+      .zoom-btn {
+        line-height: 1;
+        padding-bottom: 4px;
+      }
+    }
+
+    .zoom-btn:active {
+      transform: scale(0.95);
+      background: rgba(20, 24, 32, 1);
+    }
+
+    .zoom-level {
+      width: 50px;
+      height: 30px;
+      border-radius: 15px;
+      background: linear-gradient(180deg, rgba(20, 24, 32, .95), rgba(20, 24, 32, .92));
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, .2);
+      color: #fff;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
+    }
+
+    /* Document Container */
+    .doc-container {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #fff;
+      overflow: auto;
+      /* pan için container scroll kullanılacak */
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .doc-wrapper {
+      width: 3000px;
+      height: 5000px;
+      transform-origin: 0 0;
+      position: relative;
+    }
+
+    .doc-frame {
+      width: 3000px;
+      height: 5000px;
+      border: none;
+      display: block;
+      pointer-events: auto;
+    }
+
+    .touch-overlay {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 9999;
+      pointer-events: auto;
+      /* her zaman aktif: touch eventleri yakala */
+      background: transparent;
+      touch-action: none;
+      /* tüm touch'ları kendimiz yöneteceğiz */
+    }
+
+    @media (max-width: 768px) {
+      .touch-overlay {
+        top: 56px;
+      }
+    }
+
+    /* Loading */
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #666;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .loading::after {
+      content: '...';
+      animation: dots 1.5s infinite;
+    }
+
+    @keyframes dots {
+
+      0%,
+      20% {
+        content: '.';
+      }
+
+      40% {
+        content: '..';
+      }
+
+      60%,
+      100% {
+        content: '...';
+      }
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .header {
+        padding: 10px 16px;
+        height: 56px;
+      }
+
+      .brand {
+        font-size: 14px;
+      }
+
+      .brand img {
+        width: 24px;
+        height: 24px;
+        margin-right: 8px;
+      }
+
+      .back-btn {
+        padding: 6px 10px;
+        font-size: 13px;
+      }
+
+      .doc-container {
+        top: 56px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <div class="brand">
+      <img src="./assets/logo-120.png" alt="HİKA Logo">
+      <span>Raporlar</span>
+    </div>
+    <a href="./index.html" class="back-btn">← Ana Sayfa</a>
+  </div>
+
+  <div class="zoom-controls">
+    <div class="zoom-btn" onclick="zoomIn()">+</div>
+    <div class="zoom-level" id="zoomLevel">100%</div>
+    <div class="zoom-btn" onclick="zoomOut()">−</div>
+  </div>
+
+  <div class="touch-overlay" id="overlay"></div>
+
+  <div class="doc-container" id="container">
+    <div class="loading">Rapor yükleniyor</div>
+    <div class="doc-wrapper" id="wrapper">
+      <iframe class="doc-frame" id="iframe"
+        src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTcqImwmoqI14CTwD5adZzRUworW9fMkwFoeSRykMvsdE4YWlo0uhm_mCtadhktzESwoOJKe2MmcrnP/pubhtml?gid=1368875595&single=true&rm=minimal&widget=false"
+        allow="fullscreen" loading="eager" onload="document.querySelector('.loading').style.display='none'"></iframe>
+    </div>
+  </div>
+
+  <script>
+    let scale = 1;
+    let lastScale = 1;
+    let initialDistance = 0;
+
+    const wrapper = document.getElementById('wrapper');
+    const container = document.getElementById('container');
+    const overlay = document.getElementById('overlay');
+    const iframe = document.getElementById('iframe');
+    const zoomLevelDisplay = document.getElementById('zoomLevel');
+
+    function updateZoom() {
+      // Sadece scale uygula, boyutlar sabit
+      wrapper.style.transform = `scale(${scale})`;
+      zoomLevelDisplay.textContent = Math.round(scale * 100) + '%';
+    }
+
+    // Button zoom controls
+    function zoomIn() {
+      scale = Math.min(scale + 0.1, 5);
+      updateZoom();
+    }
+
+    function zoomOut() {
+      scale = Math.max(scale - 0.1, 0.1);
+      updateZoom();
+    }
+
+    // PÜRÜZSÜZ PINCH: belge seviyesinde yakala, iframe'i pinch sırasında kapat
+    let rafId = null;
+
+    function applyZoomSmooth() {
+      rafId = null;
+      updateZoom();
+    }
+
+    // Pinch ve Pan durumu takibi
+    let isPinching = false;
+    let isPanning = false;
+    let lastTouchX = 0;
+    let lastTouchY = 0;
+    let pinchCenterX = 0;
+    let pinchCenterY = 0;
+    let pinchStartScrollLeft = 0;
+    let pinchStartScrollTop = 0;
+
+    // Overlay üzerinde touch eventleri
+    overlay.addEventListener('touchstart', function (e) {
+      if (e.touches.length === 2) {
+        // 2 parmak: pinch başlıyor
+        isPinching = true;
+        isPanning = false;
+        initialDistance = getDistance(e.touches[0], e.touches[1]);
+        lastScale = scale;
+
+        // Pinch merkez noktasını hesapla (viewport koordinatlarında)
+        pinchCenterX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        pinchCenterY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+
+        // Başlangıç scroll pozisyonunu kaydet
+        pinchStartScrollLeft = container.scrollLeft;
+        pinchStartScrollTop = container.scrollTop;
+
+        e.preventDefault();
+        e.stopPropagation();
+      } else if (e.touches.length === 1) {
+        // 1 parmak: pan başlıyor
+        isPanning = true;
+        isPinching = false;
+        lastTouchX = e.touches[0].clientX;
+        lastTouchY = e.touches[0].clientY;
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    overlay.addEventListener('touchmove', function (e) {
+      if (e.touches.length === 2 && isPinching) {
+        // 2 parmak pinch
+        if (initialDistance === 0) {
+          initialDistance = getDistance(e.touches[0], e.touches[1]);
+          lastScale = scale;
+          pinchCenterX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+          pinchCenterY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        const currentDistance = getDistance(e.touches[0], e.touches[1]);
+        if (initialDistance > 0) {
+          const ratio = currentDistance / initialDistance;
+          const newScale = Math.max(0.1, Math.min(5, lastScale * ratio));
+
+          // Pinch noktasının container içindeki pozisyonu
+          const containerRect = container.getBoundingClientRect();
+          const offsetX = pinchCenterX - containerRect.left;
+          const offsetY = pinchCenterY - containerRect.top;
+
+          // Pinch başlangıcındaki içerik noktası
+          const contentX = (pinchStartScrollLeft + offsetX) / lastScale;
+          const contentY = (pinchStartScrollTop + offsetY) / lastScale;
+
+          scale = newScale;
+
+          if (!rafId) {
+            rafId = requestAnimationFrame(() => {
+              applyZoomSmooth();
+              // Yeni scale'de aynı içerik noktası aynı ekran pozisyonunda kalmalı
+              container.scrollLeft = contentX * newScale - offsetX;
+              container.scrollTop = contentY * newScale - offsetY;
+            });
+          }
+        }
+      } else if (e.touches.length === 1 && isPanning) {
+        // 1 parmak pan/scroll
+        e.preventDefault();
+        const deltaX = e.touches[0].clientX - lastTouchX;
+        const deltaY = e.touches[0].clientY - lastTouchY;
+
+        // Container'ı scroll et
+        container.scrollLeft -= deltaX;
+        container.scrollTop -= deltaY;
+
+        lastTouchX = e.touches[0].clientX;
+        lastTouchY = e.touches[0].clientY;
+      }
+    }, { passive: false });
+
+    overlay.addEventListener('touchend', function (e) {
+      if (e.touches.length < 2) {
+        // Pinch bitti
+        isPinching = false;
+        initialDistance = 0;
+        lastScale = scale;
+      }
+      if (e.touches.length === 0) {
+        // Tüm parmaklar kalktı
+        isPanning = false;
+      }
+    }, { passive: false });
+
+    // Prevent default pinch zoom on document
+    document.addEventListener('gesturestart', function (e) {
+      e.preventDefault();
+    });
+
+    document.addEventListener('gesturechange', function (e) {
+      e.preventDefault();
+    });
+
+    document.addEventListener('gestureend', function (e) {
+      e.preventDefault();
+    });
+
+    function getDistance(touch1, touch2) {
+      const dx = touch1.clientX - touch2.clientX;
+      const dy = touch1.clientY - touch2.clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    // Prevent default zoom on double tap
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function (e) {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, { passive: false });
+  </script>
+</body>
+
+</html>
