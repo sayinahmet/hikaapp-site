@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tablolar</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#0f172a0d;
+      --border:#e5e7eb;
+      --text:#0f172a;
+      --muted:#475569;
+      --primary:#00b0e8;
+      --primary2:#4fd1ff;
+    }
+
+    body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; color:var(--text); background:#fff; }
+    header{
+      padding: 14px 18px;
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+    header .title{ font-weight:800; }
+    header .hint{ color:var(--muted); font-size:13px; }
+
+    .layout{
+      display:grid;
+      grid-template-columns: 320px 1fr;
+      min-height: calc(100vh - 57px);
+    }
+
+    /* Sol menü */
+    .sidebar{
+      border-right:1px solid var(--border);
+      padding: 14px;
+      background: #fafafa;
+    }
+    .search{
+      width:100%;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius:10px;
+      outline:none;
+      font-size:14px;
+      margin-bottom:12px;
+    }
+    .group{ margin-top: 10px; }
+    .group-title{ font-size:12px; letter-spacing:.3px; color:var(--muted); font-weight:700; margin: 10px 4px; }
+
+    .btn{
+      width:100%;
+      text-align:left;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      background:#fff;
+      border-radius:12px;
+      cursor:pointer;
+      margin-bottom:8px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      transition: .15s transform, .15s box-shadow, .15s border-color;
+    }
+    .btn:hover{ transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,.06); border-color:#cfe8f7; }
+    .btn.active{
+      border-color: var(--primary);
+      box-shadow: 0 8px 22px rgba(0,176,232,.18);
+    }
+    .btn .name{ font-weight:800; }
+    .btn .meta{ font-size:12px; color:var(--muted); }
+
+    /* Sağ içerik */
+    .main{
+      padding: 14px;
+      background:#fff;
+    }
+    .frame-wrap{
+      border:1px solid var(--border);
+      border-radius:16px;
+      overflow:hidden;
+      box-shadow: 0 10px 28px rgba(0,0,0,.06);
+      background:#fff;
+    }
+    iframe{
+      width:100%;
+      height: calc(100vh - 115px);
+      border:0;
+      display:block;
+      background:#fff;
+    }
+
+    /* Mobil */
+    @media (max-width: 980px){
+      .layout{ grid-template-columns: 1fr; }
+      .sidebar{ border-right:none; border-bottom:1px solid var(--border); }
+      iframe{ height: 70vh; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="title">Tablolar</div>
+    <div class="hint">Soldan seçim yap — tablolar canlı güncellenir.</div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <input id="q" class="search" placeholder="Tablo ara (ör. gider, araç, stok)..." />
+
+      <div class="group">
+        <div class="group-title">Raporlar</div>
+        <div id="list"></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="frame-wrap">
+        <iframe id="frame" loading="lazy"></iframe>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // ✅ Senin canlı Apps Script Web App
+    const WEBAPP = "https://script.google.com/macros/s/AKfycbyA8NpgRWFjlZV47sEu7KGvL_zOVpeJpk8UaH6K5ZFkbvTwPaS76Tj1vtOhuK9LnFMQHg/exec";
+    const SSID   = "15NX2Fxi9ifIBbjtToNtFvrYksLRTF7G3qdJw1AJMk0I";
+
+    // Buraya tablolarını ekle (buton listesi)
+    // skip: üstten kaç satır atlanacak
+    const TABLES = [
+      { key:"arac", name:"Araç Dağılımı", meta:"Sayfa15 • A1:E14", sheet:"Sayfa15", range:"A1:E14", skip:2 },
+
+      // Örnekler (kendine göre çoğalt):
+      // { key:"gider", name:"Giderler", meta:"Sayfa1 • B1:G200", sheet:"Sayfa1", range:"B1:G200", skip:1 },
+      // { key:"gelir", name:"Gelirler", meta:"Sayfa2 • A1:F200", sheet:"Sayfa2", range:"A1:F200", skip:1 },
+      // { key:"stok",  name:"Stok",     meta:"Sayfa3 • G1:K300", sheet:"Sayfa3", range:"G1:K300", skip:0 },
+    ];
+
+    function buildUrl(t){
+      const params = new URLSearchParams({
+        ss: SSID,
+        sheet: t.sheet,
+        range: t.range,
+        skip: String(t.skip ?? 1),
+        v: String(Date.now()) // cache kırma
+      });
+      return `${WEBAPP}?${params.toString()}`;
+    }
+
+    const listEl = document.getElementById("list");
+    const frameEl = document.getElementById("frame");
+    const qEl = document.getElementById("q");
+
+    function render(filter=""){
+      listEl.innerHTML = "";
+      const f = filter.trim().toLowerCase();
+
+      TABLES
+        .filter(t => !f || (t.name + " " + (t.meta||"") + " " + t.sheet).toLowerCase().includes(f))
+        .forEach((t, idx) => {
+          const btn = document.createElement("button");
+          btn.className = "btn";
+          btn.dataset.key = t.key;
+          btn.innerHTML = `
+            <div>
+              <div class="name">${t.name}</div>
+              <div class="meta">${t.meta || (t.sheet + " • " + t.range)}</div>
+            </div>
+            <div style="color:var(--primary); font-weight:900;">›</div>
+          `;
+          btn.onclick = () => select(t.key);
+          listEl.appendChild(btn);
+
+          // ilkini default seç
+          if (idx === 0 && !frameEl.src) select(t.key);
+        });
+    }
+
+    function select(key){
+      const t = TABLES.find(x => x.key === key);
+      if (!t) return;
+
+      // active class
+      document.querySelectorAll(".btn").forEach(b => b.classList.toggle("active", b.dataset.key === key));
+
+      // iframe
+      frameEl.src = buildUrl(t);
+
+      // URL hash (sayfa yenilense bile aynı tablo açılsın)
+      location.hash = key;
+    }
+
+    // Arama
+    qEl.addEventListener("input", () => render(qEl.value));
+
+    // Hash ile açılış
+    window.addEventListener("load", () => {
+      render("");
+      const hash = (location.hash || "").replace("#","");
+      if (hash) select(hash);
+    });
+  </script>
+</body>
+</html>
