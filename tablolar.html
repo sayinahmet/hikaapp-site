@@ -121,100 +121,82 @@
   </div>
 
   <script>
-    const WEBAPP = "https://script.google.com/macros/s/AKfycbyA8NpgRWFjlZV47sEu7KGvL_zOVpeJpk8UaH6K5ZFkbvTwPaS76Tj1vtOhuK9LnFMQHg/exec";
-    const SSID   = "15NX2Fxi9ifIBbjtToNtFvrYksLRTF7G3qdJw1AJMk0I";
+  const WEBAPP = "https://script.google.com/macros/s/AKfycbyA8NpgRWFjlZV47sEu7KGvL_zOVpeJpk8UaH6K5ZFkbvTwPaS76Tj1vtOhuK9LnFMQHg/exec";
+  const SSID   = "15NX2Fxi9ifIBbjtToNtFvrYksLRTF7G3qdJw1AJMk0I";
 
-    // name: opsiyonel (boş bırakabilirsin)
-    // titleCell: başlığın yazdığı hücre (yan yana bloklarda A1, G1, M1 gibi)
-    const TABLES = [
-      { key:"arac-ady", name:"", meta:"Sayfa15 • A1:E14", sheet:"Sayfa15", range:"A1:E14", skip:2, titleCell:"A1" },
+  let TABLES = []; // artık otomatik gelecek
 
-      // Örnek (yan yana blok varsa):
-      // { key:"arac-hatay", name:"", meta:"Sayfa15 • G1:K14", sheet:"Sayfa15", range:"G1:K14", skip:2, titleCell:"G1" },
-      // { key:"arac-ank",   name:"", meta:"Sayfa15 • M1:Q14", sheet:"Sayfa15", range:"M1:Q14", skip:2, titleCell:"M1" },
-    ];
+  function buildUrl(t){
+    const params = new URLSearchParams({
+      ss: SSID,
+      sheet: t.sheet,
+      range: t.range,
+      skip: String(t.skip ?? 1),
+      v: String(Date.now())
+    });
+    return `${WEBAPP}?${params.toString()}`;
+  }
 
-    function buildUrl(t){
-      const params = new URLSearchParams({
-        ss: SSID,
-        sheet: t.sheet,
-        range: t.range,
-        skip: String(t.skip ?? 1),
-        v: String(Date.now())
+  async function loadTables(){
+    const url = `${WEBAPP}?mode=list&ss=${encodeURIComponent(SSID)}&v=${Date.now()}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!data || !data.ok) throw new Error(data?.error || "List fetch failed");
+    TABLES = data.tables || [];
+  }
+
+  const listEl = document.getElementById("list");
+  const frameEl = document.getElementById("frame");
+  const qEl = document.getElementById("q");
+
+  function render(filter=""){
+    listEl.innerHTML = "";
+    const f = filter.trim().toLowerCase();
+
+    TABLES
+      .filter(t => !f || (t.name + " " + t.sheet + " " + t.range).toLowerCase().includes(f))
+      .forEach((t, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "btn";
+        btn.dataset.key = t.key;
+        btn.innerHTML = `
+          <div>
+            <div class="name">${t.name || t.key}</div>
+            <div class="meta">${t.sheet} • ${t.range}</div>
+          </div>
+          <div style="color:var(--primary); font-weight:900;">›</div>
+        `;
+        btn.onclick = () => select(t.key);
+        listEl.appendChild(btn);
+
+        if (idx === 0 && !frameEl.src) select(t.key);
       });
-      return `${WEBAPP}?${params.toString()}`;
-    }
+  }
 
-    async function fetchTitle(t){
-      const cell = t.titleCell || "A1";
-      const url = `${WEBAPP}?mode=meta&ss=${encodeURIComponent(SSID)}&sheet=${encodeURIComponent(t.sheet)}&cell=${encodeURIComponent(cell)}&v=${Date.now()}`;
-      const res = await fetch(url);
-      const data = await res.json();
-      if (data && data.ok && data.title) return String(data.title).trim();
-      return "";
-    }
+  function select(key){
+    const t = TABLES.find(x => x.key === key);
+    if (!t) return;
 
-    async function hydrateTitles(){
-      await Promise.all(TABLES.map(async (t) => {
-        // Eğer name zaten doluysa dokunma (istersen boş bırakıp otomatik al)
-        if (t.name && t.name.trim()) return;
+    document.querySelectorAll(".btn").forEach(b => b.classList.toggle("active", b.dataset.key === key));
+    frameEl.src = buildUrl(t);
+    location.hash = key;
+  }
 
-        try {
-          const title = await fetchTitle(t);
-          if (title) t.name = title;
-          else t.name = t.key;
-        } catch (e) {
-          t.name = t.name || t.key;
-        }
-      }));
-    }
+  qEl.addEventListener("input", () => render(qEl.value));
 
-    const listEl = document.getElementById("list");
-    const frameEl = document.getElementById("frame");
-    const qEl = document.getElementById("q");
-
-    function render(filter=""){
-      listEl.innerHTML = "";
-      const f = filter.trim().toLowerCase();
-
-      TABLES
-        .filter(t => !f || (t.name + " " + (t.meta||"") + " " + t.sheet).toLowerCase().includes(f))
-        .forEach((t, idx) => {
-          const btn = document.createElement("button");
-          btn.className = "btn";
-          btn.dataset.key = t.key;
-          btn.innerHTML = `
-            <div>
-              <div class="name">${t.name}</div>
-              <div class="meta">${t.meta || (t.sheet + " • " + t.range)}</div>
-            </div>
-            <div style="color:var(--primary); font-weight:900;">›</div>
-          `;
-          btn.onclick = () => select(t.key);
-          listEl.appendChild(btn);
-
-          if (idx === 0 && !frameEl.src) select(t.key);
-        });
-    }
-
-    function select(key){
-      const t = TABLES.find(x => x.key === key);
-      if (!t) return;
-
-      document.querySelectorAll(".btn").forEach(b => b.classList.toggle("active", b.dataset.key === key));
-      frameEl.src = buildUrl(t);
-      location.hash = key;
-    }
-
-    qEl.addEventListener("input", () => render(qEl.value));
-
-    window.addEventListener("load", async () => {
-      await hydrateTitles();
+  window.addEventListener("load", async () => {
+    try{
+      await loadTables();
       render("");
 
       const hash = (location.hash || "").replace("#","");
       if (hash) select(hash);
-    });
-  </script>
+    }catch(err){
+      listEl.innerHTML = `<div style="color:#b91c1c; padding:10px; font-weight:700;">
+        Liste yüklenemedi: ${String(err)}
+      </div>`;
+    }
+  });
+</script>
 </body>
 </html>
