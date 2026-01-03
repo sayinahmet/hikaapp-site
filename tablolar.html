@@ -6,16 +6,17 @@
   <title>Tablolar</title>
   <style>
     :root{
-      --bg:#0b1220;
-      --card:#0f172a0d;
       --border:#e5e7eb;
       --text:#0f172a;
       --muted:#475569;
       --primary:#00b0e8;
       --primary2:#4fd1ff;
+      --shadow: 0 10px 24px rgba(15, 23, 42, .06);
     }
 
+    *{ box-sizing:border-box; }
     body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; color:var(--text); background:#fff; }
+
     header{
       padding: 14px 18px;
       border-bottom:1px solid var(--border);
@@ -35,17 +36,101 @@
       padding: 14px;
       background: #fafafa;
     }
-    .search{
-      width:100%;
-      padding:10px 12px;
-      border:1px solid var(--border);
-      border-radius:10px;
-      outline:none;
-      font-size:14px;
+
+    /* ✅ Modern Search */
+    .searchrow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
       margin-bottom:12px;
     }
+
+    .searchbox{
+      flex:1;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:#fff;
+      box-shadow: var(--shadow);
+      transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+    }
+
+    .searchbox:focus-within{
+      border-color: rgba(0,176,232,.6);
+      box-shadow: 0 14px 32px rgba(0,176,232,.18);
+      transform: translateY(-1px);
+    }
+
+    .search-ico{
+      font-size:14px;
+      opacity:.75;
+      user-select:none;
+    }
+
+    .search{
+      width:100%;
+      border:0 !important;
+      outline:none;
+      font-size:14px;
+      background:transparent;
+      padding:0 !important;
+      margin:0 !important;
+      color: var(--text);
+    }
+
+    .search::placeholder{ color:#94a3b8; }
+
+    .clear{
+      border:0;
+      background:#f1f5f9;
+      color:#64748b;
+      width:28px;
+      height:28px;
+      border-radius:10px;
+      cursor:pointer;
+      display:none;
+      font-size:18px;
+      line-height:0;
+      padding:0;
+      transition: background .15s ease, transform .15s ease;
+    }
+    .clear:hover{ background:#e2e8f0; transform: scale(1.03); }
+
+    .badge{
+      min-width: 44px;
+      text-align:center;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#fff;
+      box-shadow: var(--shadow);
+      color: var(--muted);
+      font-size:12px;
+      font-weight:800;
+      user-select:none;
+    }
+
     .group{ margin-top: 10px; }
-    .group-title{ font-size:12px; letter-spacing:.3px; color:var(--muted); font-weight:700; margin: 10px 4px; }
+    .group-title{
+      font-size:12px;
+      letter-spacing:.3px;
+      color:var(--muted);
+      font-weight:700;
+      margin: 10px 4px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .group-title .subhint{
+      font-weight:700;
+      color:#64748b;
+      font-size:11px;
+    }
 
     .btn{
       width:100%;
@@ -62,13 +147,27 @@
       gap:10px;
       transition: .15s transform, .15s box-shadow, .15s border-color;
     }
-    .btn:hover{ transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,.06); border-color:#cfe8f7; }
+    .btn:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(0,0,0,.06);
+      border-color:#cfe8f7;
+    }
     .btn.active{
       border-color: var(--primary);
       box-shadow: 0 8px 22px rgba(0,176,232,.18);
     }
     .btn .name{ font-weight:800; }
     .btn .meta{ font-size:12px; color:var(--muted); }
+
+    .empty{
+      padding: 10px 12px;
+      border:1px dashed #cbd5e1;
+      background:#fff;
+      border-radius:12px;
+      color:#64748b;
+      font-weight:700;
+      font-size:13px;
+    }
 
     .main{
       padding: 14px;
@@ -100,15 +199,27 @@
 <body>
   <header>
     <div class="title">Tablolar</div>
-    <div class="hint">Soldan seçim yap — tablolar canlı güncellenir.</div>
+    <div class="hint">Soldan seçim yap — tablolar canlı güncellenir. (<b>/</b> ile ara)</div>
   </header>
 
   <div class="layout">
     <aside class="sidebar">
-      <input id="q" class="search" placeholder="Tablo ara (ör. gider, araç, stok)..." />
+
+      <!-- ✅ Modern Search Row -->
+      <div class="searchrow">
+        <div class="searchbox">
+          <span class="search-ico" aria-hidden="true">🔎</span>
+          <input id="q" class="search" placeholder="Tablo ara (ör. hatay, adıyaman, araç)..." />
+          <button id="clearBtn" class="clear" type="button" title="Temizle" aria-label="Temizle">×</button>
+        </div>
+        <div id="countBadge" class="badge" title="Sonuç sayısı">0</div>
+      </div>
 
       <div class="group">
-        <div class="group-title">Raporlar</div>
+        <div class="group-title">
+          <span>Raporlar</span>
+          <span id="status" class="subhint"></span>
+        </div>
         <div id="list"></div>
       </div>
     </aside>
@@ -121,47 +232,70 @@
   </div>
 
   <script>
-  const WEBAPP = "https://script.google.com/macros/s/AKfycbyA8NpgRWFjlZV47sEu7KGvL_zOVpeJpk8UaH6K5ZFkbvTwPaS76Tj1vtOhuK9LnFMQHg/exec";
-  const SSID   = "15NX2Fxi9ifIBbjtToNtFvrYksLRTF7G3qdJw1AJMk0I";
+    const WEBAPP = "https://script.google.com/macros/s/AKfycbyA8NpgRWFjlZV47sEu7KGvL_zOVpeJpk8UaH6K5ZFkbvTwPaS76Tj1vtOhuK9LnFMQHg/exec";
+    const SSID   = "15NX2Fxi9ifIBbjtToNtFvrYksLRTF7G3qdJw1AJMk0I";
 
-  let TABLES = []; // artık otomatik gelecek
+    let TABLES = []; // otomatik gelecek
+    let lastRenderedCount = 0;
 
-  function buildUrl(t){
-    const params = new URLSearchParams({
-      ss: SSID,
-      sheet: t.sheet,
-      range: t.range,
-      skip: String(t.skip ?? 1),
-      v: String(Date.now())
-    });
-    return `${WEBAPP}?${params.toString()}`;
-  }
+    function buildUrl(t){
+      const params = new URLSearchParams({
+        ss: SSID,
+        sheet: t.sheet,
+        range: t.range,
+        skip: String(t.skip ?? 1),
+        v: String(Date.now())
+      });
+      return `${WEBAPP}?${params.toString()}`;
+    }
 
-  async function loadTables(){
-    const url = `${WEBAPP}?mode=list&ss=${encodeURIComponent(SSID)}&v=${Date.now()}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    if (!data || !data.ok) throw new Error(data?.error || "List fetch failed");
-    TABLES = data.tables || [];
-  }
+    async function loadTables(){
+      const url = `${WEBAPP}?mode=list&ss=${encodeURIComponent(SSID)}&v=${Date.now()}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!data || !data.ok) throw new Error(data?.error || "List fetch failed");
+      TABLES = data.tables || [];
+    }
 
-  const listEl = document.getElementById("list");
-  const frameEl = document.getElementById("frame");
-  const qEl = document.getElementById("q");
+    const listEl = document.getElementById("list");
+    const frameEl = document.getElementById("frame");
+    const qEl = document.getElementById("q");
+    const clearBtn = document.getElementById("clearBtn");
+    const countBadge = document.getElementById("countBadge");
+    const statusEl = document.getElementById("status");
 
-  function render(filter=""){
-    listEl.innerHTML = "";
-    const f = filter.trim().toLowerCase();
+    function syncClear(){
+      const has = qEl.value.trim().length > 0;
+      clearBtn.style.display = has ? "inline-flex" : "none";
+    }
 
-    TABLES
-      .filter(t => !f || (t.name + " " + t.sheet + " " + t.range).toLowerCase().includes(f))
-      .forEach((t, idx) => {
+    function setCount(n){
+      lastRenderedCount = n;
+      countBadge.textContent = String(n);
+    }
+
+    function render(filter=""){
+      listEl.innerHTML = "";
+      const f = filter.trim().toLowerCase();
+
+      const filtered = TABLES.filter(t =>
+        !f || ((t.name || t.key) + " " + t.sheet + " " + t.range).toLowerCase().includes(f)
+      );
+
+      setCount(filtered.length);
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<div class="empty">Sonuç bulunamadı. Arama kelimesini değiştir.</div>`;
+        return;
+      }
+
+      filtered.forEach((t, idx) => {
         const btn = document.createElement("button");
         btn.className = "btn";
         btn.dataset.key = t.key;
         btn.innerHTML = `
           <div>
-            <div class="name">${t.name || t.key}</div>
+            <div class="name">${(t.name || t.key)}</div>
             <div class="meta">${t.sheet} • ${t.range}</div>
           </div>
           <div style="color:var(--primary); font-weight:900;">›</div>
@@ -169,34 +303,67 @@
         btn.onclick = () => select(t.key);
         listEl.appendChild(btn);
 
+        // ilkini default seç
         if (idx === 0 && !frameEl.src) select(t.key);
       });
-  }
-
-  function select(key){
-    const t = TABLES.find(x => x.key === key);
-    if (!t) return;
-
-    document.querySelectorAll(".btn").forEach(b => b.classList.toggle("active", b.dataset.key === key));
-    frameEl.src = buildUrl(t);
-    location.hash = key;
-  }
-
-  qEl.addEventListener("input", () => render(qEl.value));
-
-  window.addEventListener("load", async () => {
-    try{
-      await loadTables();
-      render("");
-
-      const hash = (location.hash || "").replace("#","");
-      if (hash) select(hash);
-    }catch(err){
-      listEl.innerHTML = `<div style="color:#b91c1c; padding:10px; font-weight:700;">
-        Liste yüklenemedi: ${String(err)}
-      </div>`;
     }
-  });
-</script>
+
+    function select(key){
+      const t = TABLES.find(x => x.key === key);
+      if (!t) return;
+
+      document.querySelectorAll(".btn").forEach(b => b.classList.toggle("active", b.dataset.key === key));
+      frameEl.src = buildUrl(t);
+      location.hash = key;
+    }
+
+    // ✅ input events
+    qEl.addEventListener("input", () => {
+      render(qEl.value);
+      syncClear();
+    });
+
+    clearBtn.addEventListener("click", () => {
+      qEl.value = "";
+      qEl.focus();
+      render("");
+      syncClear();
+    });
+
+    // ✅ "/" ile aramaya odaklan
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "/" && document.activeElement !== qEl) {
+        e.preventDefault();
+        qEl.focus();
+      }
+      // ESC ile temizle
+      if (e.key === "Escape" && document.activeElement === qEl) {
+        qEl.value = "";
+        render("");
+        syncClear();
+      }
+    });
+
+    window.addEventListener("load", async () => {
+      try{
+        statusEl.textContent = "Yükleniyor…";
+        await loadTables();
+        statusEl.textContent = "";
+
+        render("");
+        syncClear();
+
+        const hash = (location.hash || "").replace("#","");
+        if (hash) select(hash);
+
+      }catch(err){
+        statusEl.textContent = "";
+        listEl.innerHTML = `<div style="color:#b91c1c; padding:10px; font-weight:800;">
+          Liste yüklenemedi: ${String(err)}
+        </div>`;
+        setCount(0);
+      }
+    });
+  </script>
 </body>
 </html>
